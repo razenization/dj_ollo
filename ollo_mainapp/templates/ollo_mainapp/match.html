@@ -1,0 +1,243 @@
+{% load static %}
+{% load index_extras %}
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link type="text/css" rel="stylesheet" href="{% static 'ollo_mainapp/libs/material/css/materialize.min.css' %}" media="screen,projection" />
+    <link href="https://fonts.googleapis.com/css?family=Bebas+Neue|Open+Sans:400,700&display=swap&subset=cyrillic" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'ollo_mainapp/css/style.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'ollo_mainapp/css/header-style.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'ollo_mainapp/libs/fontawesome/css/all.min.css' %}">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" rel="stylesheet">
+    <title>ollo.gg</title>
+    <link type="text/css" rel="stylesheet" href="{% static 'ollo_mainapp/css/fonts.css' %}" />
+    <link type="text/css" rel="stylesheet" href="{% static 'ollo_mainapp/css/live-style.css' %}" />
+    <link type="text/css" rel="stylesheet" href="{% static 'ollo_mainapp/css/stream-style.css' %}" />
+    <link type="text/css" rel="stylesheet" href="{% static 'ollo_mainapp/css/bans-style.css' %}" />
+</head>
+
+<body>
+
+<div class="all-with-footer">
+    <div class="body">
+        <div class="header__main">
+            <div class="container__head">
+
+                <div class="header__inner">
+                    <div class="header-logo" id="headerNavLink">
+                        <img src="{% static 'ollo_mainapp/images/main_logo1.png' %}" alt="ollo.gg" style="width: 100%;">
+                    </div>
+
+                    <a href="/" class="main__nav__item__mobile">Матчи</a>
+                    <a href="{% url 'results' %}" class="main__nav__item__mobile">Результаты</a>
+
+                    <div class="nav" id="nav">
+                        <a href="/" class="nav__item">Новости<span class="soon">бета</span></a>
+                        <a href="/" class="nav__item">Матчи</a>
+                        <a href="{% url 'results' %}" class="nav__item">Результаты</a>
+                        <a class="nav__item themeSwitchMob">Сменить тему</a>
+                        <a class="nav__item soundVolumeMob" on="true">Выключить звук</a>
+                        <a href="/" class="nav__item">Аналитика<span class="soon">скоро</span></a>
+                        <a class="nav__item">Статистика<span class="soon">скоро</span></a>
+                        <a class="nav__item">Оценка пиков<span class="soon">скоро</span></a>
+                        <div class="ui-control uiControlHide">
+                            <i class="material-icons volume" id="themeSwitch">brightness_7</i>
+                            <i class="material-icons delim">remove</i>
+                            <i class="material-icons volume soundVolume" id="soundVolume" on="true">volume_up</i>
+                        </div>
+
+                    </div>
+                    <button class="nav__toggle " id="nav__toggle" type="button">
+                        <span class="nav__toggle__item">Menu</span>
+                    </button>
+
+                </div>
+            </div>
+        </div>
+
+<div class="main-content1">
+    <div class="container">
+        <div class="main-content">
+            <div class="main-content-inner">
+                <div class="LEFT-BAR">
+                    <div class="statistics-bar">
+                        <div class="statistics-bar__item">
+                            <h2 class="leftbar-title">Статистика</h2>
+                            <img src="{% get_static_prefix %}{{ match.team_set|get_logo:0 }}" alt="" class="team-logo-view team1Pic">
+                            <h7>{{ match.team_set|get_winrate:0 }}</h7>
+                            <img src="{% get_static_prefix %}{{ match.team_set|get_logo:1 }}" alt="" class="team-logo-view team2Pic">
+                            <h7>{{ match.team_set|get_winrate:1 }}</h7>
+{#                            <canvas id="myStas" class="chart bar_chart"></canvas>#}
+
+                        </div>
+                        <div class="statistics-bar__item">
+                            <h2 class="leftbar-title">Кол-во win/lose</h2>
+                            <div class="stat-info">
+
+                                <div class="stat-bar-team">
+                                    <img src="{% get_static_prefix %}{{ match.team_set|get_logo:0 }}" alt="" class="team-logo-view team1Pic">
+                                    <span class="rate win_rate pastScoreWinTeam1">{{ match.team_set|get_win:0 }}</span>
+                                    <span class="rate lose_rate pastScoreLoseTeam1">{{ match.team_set|get_lose:0 }}</span>
+                                </div>
+
+                                <div class="stat-bar-team">
+                                    <img src="{% get_static_prefix %}{{ match.team_set|get_logo:1 }}" alt="" class="team-logo-view team2Pic">
+                                    <span class="rate win_rate pastScoreWinTeam2">{{ match.team_set|get_win:1 }}</span>
+                                    <span class="rate lose_rate pastScoreLoseTeam2">{{ match.team_set|get_lose:1 }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="statistics-bar__item">
+                            <h2 class="leftbar-title">Рейтинг команд</h2>
+                            <img src="{% get_static_prefix %}{{ match.team_set|get_logo:0 }}" alt="" class="team-logo-view team1Pic">
+                            <h7>{{ match.team_set|get_elo:0 }}</h7>
+                            <img src="{% get_static_prefix %}{{ match.team_set|get_logo:1 }}" alt="" class="team-logo-view team2Pic">
+                            <h7>{{ match.team_set|get_elo:1 }}</h7>
+{#                            <canvas id="myRating" class="chart pie_chart chartjs-render-monitor" width="240" height="120" style="display: block;"></canvas>#}
+                        </div>
+                    </div>
+                    <div class="news">
+                        <h2 class="leftbar-title">Новости</h2>
+                        <div id="lastNews">
+                        {% if news %}
+                            {% for new in news %}
+                                <a href="{% url 'news' new.id %}" class="news-item news-item-light-dark">
+                                    <span class="news-text">OG Seed сыграет с Team Singularity в полуфинале Maincast Winter Brawl</span>
+                                    <div class="news-bg" style="background-image: url({% get_static_prefix %}{{ new.thumb_pic }});"></div>
+                                </a>
+                            {% endfor %}
+                        {% else %}
+                            <span class="no-streems">Новостей пока нет...</span>
+                        {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="CENTER">
+                    <div class="main-block">
+                        <h3 class="main-block-title" id="bookMaker">{{ match.league }}</h3>
+                        <div class="score">
+                            <div class="score-inner">
+                                <div class="score-item">
+                                    <span class="team-name team1Name">{{ match.team_set|get_name:0 }}</span>
+                                    <img src="{% get_static_prefix %}{{ match.team_set|get_logo:0 }}" alt="" class="team-logo_big_big team1Pic">
+                                </div>
+                                <div class="score-item score-item_2">
+                                    <span class="match-info match-info_type" id="bestOf">{{ match.best_of }}</span>
+                                    {% with start_time=match.start_date|get_local_time %}
+                                    <span class="match-info match-info_date" id="startMatch">{{ start_time.day|zfill:2 }}.{{ start_time.month|zfill:2 }}</span>
+                                    <span class="match-info match-info_date" id="startMatch">{{ start_time.hour|zfill:2 }}:{{ start_time.minute|zfill:2 }}</span>
+                                    {% endwith %}
+                                </div>
+                                <div class="score-item ">
+                                    <img src="{% get_static_prefix %}{{ match.team_set|get_logo:1 }}" alt="" class="team-logo_big_big team2Pic">
+                                    <span class="team-name team2Name">{{ match.team_set|get_name:1 }}</span>
+                                </div>
+                            </div>
+                        <canvas id="myChart" class="chart main_chart chartjs-render-monitor" style="display: block;"></canvas>
+                        </div>
+                    <div class="players">
+{#                        <span class="first-blood">Первая кровь: <span class="name-fblood" id="firstblood"></span></span>#}
+                        <div class="players-inner">
+                            <img src="{% get_static_prefix %}{{ match.team_set|get_logo:0 }}" alt="" class="team1-logo-players team1Pic">
+                            <img src="{% get_static_prefix %}{{ match.team_set|get_logo:1 }}" alt="" class="team2-logo-players team2Pic">
+                            <div class="team-1" id="team1Heroes">
+                            {% if match.team_set|get_players:0 %}
+                                {% for player in match.team_set|get_players:0 %}
+                                    <div class="player-info player-info_team2">
+                                        <div class="info-title info-title-team2">
+                                            <span class="player-nick">{{ player.nickname }}</span>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="player-info player-info_team2">
+                                    <div class="info-title info-title-team2">
+                                        <span class="player-nick">Для этой команды нет зарегистрированных игроков.</span>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            </div>
+                            <div class="delimiter"></div>
+                            <div class="team-2" id="team2Heroes">
+                            {% if match.team_set|get_players:1 %}
+                                {% for player in match.team_set|get_players:1 %}
+                                    <div class="player-info player-info_team2">
+                                        <div class="info-title info-title-team2">
+                                            <span class="player-nick">{{ player.nickname }}</span>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="player-info player-info_team2">
+                                    <div class="info-title info-title-team2">
+                                        <span class="player-nick">Для этой команды нет зарегистрированных игроков.</span>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="RIGHT-BAR">
+                    <div class="right-bar">
+                    </div>
+                    <div class="advertising">
+                        <div class="banner">
+                            <a href="https://betwinner.com/ru/" class="banner-link">
+                                <img src="{% static 'ollo_mainapp/images/gif_promo.gif' %}" alt=""
+                                     class="banner-img mdsix advertising-img baner-img-desktop">
+                            </a>
+                        </div>
+                        <a href='https://betwinner.com' target="_blank">
+                            <button class="btn waves-effect waves-light bet-btn" type="button"
+                                    name="action">Сделать ставку
+                                <i class="material-icons">attach_money</i>
+                            </button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+</div>
+
+
+<footer>
+    <div class="container footer">
+        <div class="foot-left">
+            <div class="social">
+                <a href="https://vk.com/ollogg" ><i class="fab fa-vk footer-icons"></i></a>
+<!--                <img src="images/Icons/telega.png" alt="">-->
+            </div>
+            <div class="license">
+                Copyright © OLLO.GG 2019 ALL Rights Reserved
+            </div>
+            <div class="advance">
+                advancement by maked.me
+            </div>
+            <hr>
+            <div class="license">
+                <a href="mailto:ollo@maked.me">ollo@maked.me</a>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+<script type="text/javascript" src="{% static 'ollo_mainapp/libs/material/js/materialize.min.js' %}"></script>
+{#<script type="text/javascript" src="{% static 'ollo_mainapp/js/functions.js' %}"></script>#}
+<script type="text/javascript">
+    Resize();
+</script>
+{#<script type="text/javascript" src="{% static 'ollo_mainapp/js/init.js' %}"></script>#}
+{#<script type="text/javascript" src="{% static 'ollo_mainapp/js/purecookie.js' %}"></script>#}
+<script src="{% static 'ollo_mainapp/js/livemap.js' %}"></script>
+</div>
+</body>
+</html>

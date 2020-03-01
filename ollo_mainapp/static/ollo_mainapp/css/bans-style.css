@@ -1,0 +1,73 @@
+/*---- BANS -------*/
+.bans-team-1,
+.bans-team-2{
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-row-gap: 10px;
+	justify-items:center;
+
+}
+.bans{
+	display: grid;
+	grid-auto-columns: 1fr;
+	grid-row-gap: 10px;
+	padding-bottom: 10px;
+
+
+}
+.ban-img{
+	position: relative;
+
+
+
+}
+.hero-ban-img{
+	border-radius: 50%;
+	width: 57px;
+	height: 47px;
+	-webkit-background-size: auto;
+	background-size: auto;
+	background-position: unset;
+	background-repeat: no-repeat;
+}
+
+.ban-text{
+	font-family: 'Cera Pro', sans-serif;
+
+	display: inline;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	position: absolute;
+	z-index: 1000;
+	color: white;
+	font-size: 9px;
+	font-weight:700;
+	text-align: center;
+	background: #FF8700;
+	border-radius: 5%;
+}
+.bans-title{
+	font-style: normal;
+	font-weight: bold;
+	font-size: 16px;
+	line-height: 20px;
+	color: #FF9600;
+	padding: 10px;
+	text-transform: uppercase;
+	border-bottom: 1px solid #EBEBEB
+}
+.bans-item{
+	display: grid;
+	grid-template-columns: 1fr;
+
+	grid-row-gap: 10px;
+}
+
+.bans-item-title{
+	grid-column:-1/1;
+	white-space: normal;
+	text-align: center;
+}
+
+/*----------------*/

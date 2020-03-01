@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+{% load static %}
+{% load index_extras %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="yandex-verification" content="aa5b4aa227a558da"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="verification" content="ed7a78404d1cc1d50a66755ff8f529"/>
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="{% static 'ollo_mainapp/libs/material/css/materialize.min.css' %}"
+          media="screen,projection"/>
+    <link href="https://fonts.googleapis.com/css?family=Bebas+Neue|Open+Sans:400,700&display=swap&subset=cyrillic"
+          rel="stylesheet">
+    <!--  <link rel="shortcut icon" href="/images/Icons/favicon.png" type="image/x-icon">-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--<link type="text/css" rel="stylesheet" href="news/css/view_news.css"/>-->
+    <link type="text/css" rel="stylesheet" href="{% static 'ollo_mainapp/css/style.css' %}"/>
+    <link type="text/css" rel="stylesheet" href="{% static 'ollo_mainapp/css/header-style.css' %}"/>
+    <link type="text/css" rel="stylesheet" href="{% static 'ollo_mainapp/css/past.css' %}"/>
+    <!--<link type="text/css" rel="stylesheet" href="css/view.css" />-->
+    <!--<link type="text/css" rel="stylesheet" href="css/upcoming/style.css" />-->
+    <!--<link type="text/css" rel="stylesheet" href="css/upcoming/fonts.css" />-->
+    <!--<link rel="stylesheet" type="text/css" href="news/css/news_style.css">-->
+    <!--<link rel="stylesheet" type="text/css" href="news/css/viewnews_style.css">-->
+    <link rel="stylesheet" type="text/css" href="{% static 'ollo_mainapp/libs/fontawesome/css/all.min.css' %}">
+    <!--    <link type="text/css" rel="stylesheet" href="css/themes/light.css"/>-->
+    <!--Let browser know website is optimized for mobile-->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" rel="stylesheet">
+    <title>ollo.gg</title>
+    <link type="text/css" rel="stylesheet" href="{% static 'ollo_mainapp/css/loader-style.css' %}"/>
+</head>
+
+<body>
+
+<!--Это SIDENAV, он тут находится
+ потому что в .body находится css фильтр,
+  который дико козябит Sidenav -->
+<!--<ul class="sidenav" id="mobile-demo">-->
+<!--    <li><a href="news/?p=1">Новости<span class="soon-mobile">бета</span></a></li>-->
+<!--    <li><a href="#">Матчи</a></li>-->
+<!--    <li><a href="matches/?p=1">Результаты</a></li>-->
+<!--    <li><a href="upcoming/">Аналитика<span class="soon-mobile">скоро</span></a></li>-->
+<!--    <li><a href="#">Статистика<span class="soon-mobile">скоро</span></a></li>-->
+<!--    <li><a href="#">Оценка пиков<span class="soon-mobile">скоро</span></a></li>-->
+<!--    <li><a href="#" class="themeSwitchMob">Сменить тему</a></li>-->
+<!--</ul>-->
+<div class="all-with-footer">
+    <div class="body">
+        <div class="header__main">
+            <div class="container__head">
+
+                <div class="header__inner">
+                    <!--                    <img src="images/main_logo.png" alt="" class="logo brand-logo" >-->
+                    <div class="header-logo" id="headerNavLink">
+                        <!--                        <span style="letter-spacing: -2px; font-family: 'Open Sans', sans-serif;">OLLO</span>-->
+                        <img src="{% static 'ollo_mainapp/images/main_logo1.png' %}" alt="ollo.gg" style="width: 100%;">
+                    </div>
+
+                    <a href="/" class="main__nav__item__mobile">Матчи</a>
+                    <a href="{% url 'results' %}" class="main__nav__item__mobile">Результаты</a>
+
+                    <div class="nav" id="nav">
+                        <a href="/" class="nav__item">Новости<span class="soon">бета</span></a>
+                        <a href="/" class="nav__item">Матчи</a>
+                        <a href="{% url 'results' %}" class="nav__item">Результаты</a>
+                        <a class="nav__item themeSwitchMob">Сменить тему</a>
+                        <a class="nav__item soundVolumeMob" on="true">Выключить звук</a>
+                        <a href="/" class="nav__item">Аналитика<span class="soon">скоро</span></a>
+                        <a class="nav__item">Статистика<span class="soon">скоро</span></a>
+                        <a class="nav__item">Оценка пиков<span class="soon">скоро</span></a>
+                        <div class="ui-control uiControlHide">
+                            <i class="material-icons volume" id="themeSwitch">brightness_7</i>
+                            <i class="material-icons delim">remove</i>
+                            <i class="material-icons volume soundVolume" id="soundVolume" on="true">volume_up</i>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Основной контент -->
+        <div class="main-content">
+            <div class="container">
+                <div class="row">
+
+                    <!-- Левый сайтбар -->
+                    <div class="col m8 l8 s12">
+                        <div class="row">
+                            <div class="col m12 l12 s12" style=" padding: 0">
+                                {% block leftbar %}
+                                    {# leftbar content #}
+                                {% endblock %}
+                            </div>
+                        </div>
+                        </ul>
+                    </div>
+
+                    <!-- Правый сайтбар -->
+                    <div class="col m4 l4 s12">
+                        <div class="row">
+                            <div class="col m12 l12 s12">
+                                <div class="rating">
+                                    <h2 class="rating-title">Командный рейтинг:</h2>
+                                    <div id="topTeams">
+                                        <ul>
+                                            {% for team in top_teams %}
+                                                <li class="collection rating-item">
+                                                    <img src="{% get_static_prefix %}{{ team.logo }}"
+                                                         style="height: 50px; width: 90px">
+                                                    <h7>{{ team.elo }}</h7>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col m12 s12 l12">
+                                <div class="banner">
+                                    <a href="https://betwinner.com/ru/" class="banner-link">
+                                        <img src="{% static 'ollo_mainapp/images/gif_promo.gif' %}" alt=""
+                                             class="banner-img mdsix advertising-img baner-img-desktop">
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container footer">
+            <div class="foot-left">
+                <div class="social">
+                    <a href="https://vk.com/ollogg"><i class="fab fa-vk footer-icons"></i></a>
+                    <!--                <img src="images/Icons/telega.png" alt="">-->
+                </div>
+                <div class="license">
+                    Copyright © OLLO.GG 2019 ALL Rights Reserved
+                </div>
+                <div class="advance">
+                    advancement by maked.me
+                </div>
+                <hr>
+                <div class="license">
+                    <a href="mailto:ollo@maked.me">ollo@maked.me</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<script type="text/javascript" src="{% static 'ollo_mainapp/libs/material/js/materialize.min.js' %}"></script>
+<script type="text/javascript">
+    VK.Widgets.CommunityMessages("vk_community_messages", 187390956, {
+        widgetPosition: "left",
+        tooltipButtonText: "Есть вопрос?"
+    });
+</script>
+<script src="https://unpkg.com/spacetime"></script>
+<script type="text/javascript" src="{% static 'ollo_mainapp/js/script.js' %}"></script>
+</body>
+</html>
