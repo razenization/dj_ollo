@@ -194,7 +194,7 @@ def get_matches():
 
     matchdays = upcomingmatches.find_all("div", {"class": "match-day"})
 
-    for match in matchdays[:1]:
+    for match in matchdays[:2]:
         matchDetails = match.find_all("table", {"class": "table"})
 
         for getMatch in matchDetails:

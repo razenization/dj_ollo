@@ -41,12 +41,18 @@ INSTALLED_APPS = [
     'ollo_cs',
     'django_cron',
     'channels',
-    # 'rest_framework',
-    # 'rest_framework.authtoken',
-    # 'djoser',
 ]
 
-ASGI_APPLICATION = "ollo.routing.application"
+ASGI_APPLICATION = 'ollo.routing.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
 
 # REST_FRAMEWORK = {
 #     'DEFAULT_AUTHENTICATION_CLASSES': (

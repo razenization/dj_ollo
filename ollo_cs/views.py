@@ -4,6 +4,7 @@ from django.utils import timezone
 from ollo_cs.models import Match
 from ollo_cs.parse.live.livescore import Livescore
 # from .parse import base
+from service import SocketLivescore
 from .parse.live import game
 # Create your views here.
 
@@ -23,6 +24,6 @@ def match(request, match_id):
     match = get_object_or_404(Match, pk=match_id)
     context = {'match': match}
     if match.is_live:
-        livescore = Livescore(match.match_id, game.sb_callb, game.event_callb)
+        livescore = SocketLivescore(match.match_id)
         context.setdefault('livescore', livescore)
     return render(request, 'ollo_cs/match.html', context)

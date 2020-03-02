@@ -40,27 +40,24 @@
                                                         <h4>{{ match.league }}</h4>
                                                     </div>
                                                     <div class="view live-score-view">
-                                                        <div class="live hide-on-small-only">LIVE
+                                                        <div class="live hide-on-small-only">
+                                                            LIVE
+                                                            <i class="material-icons">brightness_1</i>
                                                         </div>
-                                                                                                                        <i class="material-icons">brightness_1</i>
                                                         <div class="live-name-and-logo">
                                                             <img src="{{ match.team_set.all.0.logo }}" class="picImg ">
                                                             <h5>{{ match.team_set.all.0.name }}</h5>
                                                         </div>
                                                         <div class="score-view">
                                                             <div class="live-teams-score">
-                                                                <h5>{{  }}</h5>
+                                                                <h5>{{ match.team_set.all.0.score }}</h5>
                                                                 <h5 class="delim-score">:</h5>
-                                                                <h5>{{ match.team2_score }}</h5>
+                                                                <h5>{{ match.team_set.all.1.score }}</h5>
                                                             </div>
                                                         </div>
                                                         <div class="live-name-and-logo">
-                                                            <h5>{{ match.get_second_team_name }}</h5>
-                                                            <img src="
-
-
-                                                                    {% get_static_prefix %}{{ match.get_second_team_logo }}"
-                                                                 class="picImg ">
+                                                            <h5>{{ match.team_set.all.1.name }}</h5>
+                                                            <img src="{{ match.team_set.all.1.logo }}" class="picImg ">
                                                         </div>
                                                     </div>
                                                 </a>

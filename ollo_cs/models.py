@@ -34,6 +34,7 @@ class Team(models.Model):
     avg_age = models.FloatField(default=0, null=True)
     winrate = models.FloatField(default=0)
     last_matches = JSONField()
+    score = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name
