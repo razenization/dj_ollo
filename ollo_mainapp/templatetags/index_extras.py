@@ -4,8 +4,6 @@ from json import JSONDecodeError
 from django import template
 from django.utils import timezone
 
-from ollo_mainapp.models import Match, Player
-
 register = template.Library()
 
 

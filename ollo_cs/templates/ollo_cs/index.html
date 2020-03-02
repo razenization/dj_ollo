@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+{% extends 'ollo_cs/base.html' %}
+{% load static %}
+{% load cs_tags %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% block main %}
+    <div class="row">
+        <!-- Будущие матчи -->
+        <div class="col m12 l12 s12">
+            <ul class="collection with-header">
+                <li class="collection-header match-tabs">
+                    <ul class="tabs">
+                        <li class="tab"
+                            style="flex-grow: 0;-webkit-box-flex: 0;-webkit-flex-grow:0;"><a
+                                class="active" href="#test1">Текущие матчи</a></li>
+                        <li class="tab"
+                            style="flex-grow: 0;-webkit-box-flex: 0;-webkit-flex-grow:0;"><a
+                                href="#test2">Прошедшие матчи</a></li>
+                    </ul>
+                </li>
+
+                <li class="collection-item">
+                    <div class="normal-view">
+                        <div id="test1">
+                            <div id="liveMatches">
+                                {% if lives %}
+                                    <ul>
+                                        {% for match in lives %}
+                                            <li class="collection-item lives"
+                                                hr="{% url 'match' match.id %}">
+                                                <a class="live-thumb"
+                                                   href="{% url 'match' match.id %}">
+                                                    <div class="live-tour-in">
+                                                        <h4>{{ match.league }}</h4>
+                                                    </div>
+                                                    <div class="view live-score-view">
+                                                        <div class="live hide-on-small-only">LIVE
+                                                        </div>
+                                                                                                                        <i class="material-icons">brightness_1</i>
+                                                        <div class="live-name-and-logo">
+                                                            <img src="{{ match.team_set.all.0.logo }}" class="picImg ">
+                                                            <h5>{{ match.team_set.all.0.name }}</h5>
+                                                        </div>
+                                                        <div class="score-view">
+                                                            <div class="live-teams-score">
+                                                                <h5>{{  }}</h5>
+                                                                <h5 class="delim-score">:</h5>
+                                                                <h5>{{ match.team2_score }}</h5>
+                                                            </div>
+                                                        </div>
+                                                        <div class="live-name-and-logo">
+                                                            <h5>{{ match.get_second_team_name }}</h5>
+                                                            <img src="
+
+
+                                                                    {% get_static_prefix %}{{ match.get_second_team_logo }}"
+                                                                 class="picImg ">
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <h5 class="no-live" id="noLive">Нет активных матчей...</h5>
+                                {% endif %}
+                            </div>
+                            <!-- Будущие матчи -->
+                            <h5 class="future-matches-h5">Предстоящие матчи</h5>
+                            <div id="liveMatches">
+                                {% if upcoming %}
+                                    <ul>
+                                        {% for match in upcoming %}
+                                            {#                                                    <li class="collection-item"><a href="{% url 'match' match.id %}">{{ match }}</a></li>#}
+                                            <li class="collection-item lives"
+                                                hr="{% url 'match' match.id %}">
+                                                <a class="live-thumb"
+                                                   href="{% url 'match' match.id %}">
+                                                    <div class="live-tour-in">
+                                                        {% with start_time=match.start_date|get_local_time %}
+                                                            <div class="time-m">{{ start_time.day|zfill:2 }}.{{ start_time.month|zfill:2 }} {{ start_time.hour|zfill:2 }}:{{ start_time.minute|zfill:2 }}</div>
+                                                        {% endwith %}
+                                                    </div>
+                                                    <div class="view live-score-view">
+                                                        <div class="live-name-and-logo">
+                                                            <img src="{{ match.team_set.all.0.logo }}" class="picImg ">
+                                                            <h5>{{ match.team_set.all.0.name }}</h5>
+                                                        </div>
+                                                        <div class="score-view">
+                                                            <div class="live-teams-score">
+                                                                <h5 class="delim-score">VS</h5>
+                                                            </div>
+                                                        </div>
+                                                        <div class="live-name-and-logo">
+                                                            <h5>{{ match.team_set.all.1.name }}</h5>
+                                                            <img src="{{ match.team_set.all.1.logo }}" class="picImg ">
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <h5 class="no-live">Список предстоящих матчей пуст...</h5>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+{% endblock %}
+</body>
+</html>

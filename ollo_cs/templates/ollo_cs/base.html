@@ -125,75 +125,73 @@
                         {% block main %}
                         {% endblock %}
                     </div>
-                </div>
-            </div>
 
-            <!-- Правый сайтбар -->
-            <div class="col m4 l4 s12">
-                <div class="row">
-                    <div class="col m12 l12 s12">
-                        <ul class="collection with-header" style="border: none">
-                            <li class="collection-header" style="padding: 8px 10px;border: 1px solid #e0e0e0;">
-                                <h4>Новости</h4>
-                            </li>
-                            <div class="windows8" id="newsPreloader"></div>
-                            <div id="newsList">
-                                {% if news %}
-                                    {% for new in news %}
-                                        <li class="collection-item">
-                                            <div class="card newsCard" style="overflow: visible;">
-                                                <div class="card-image waves-effect waves-block waves-light activator georgeBustLt"
-                                                     style="background-image: url(
-                                                             {% get_static_prefix %}{{ new.thumb_pic }});"></div>
-                                                <div class="card-content">
-                                                    <span class="card-title activator grey-text text-darken-4">{{ new.title }}</span>
-                                                    <p><a href="{% url 'news' new.id %}" class="news-btn-txt">Перейти
-                                                        к статье</a></p>
-                                                </div>
-                                                <div class="card-reveal">
+                    <!-- Правый сайтбар -->
+                    <div class="col m4 l4 s12">
+                        <div class="row">
+                            <div class="col m12 l12 s12">
+                                <ul class="collection with-header" style="border: none">
+                                    <li class="collection-header" style="padding: 8px 10px;border: 1px solid #e0e0e0;">
+                                        <h4>Новости</h4>
+                                    </li>
+                                    <div class="windows8" id="newsPreloader"></div>
+                                    <div id="newsList">
+                                        {% if news %}
+                                            {% for new in news %}
+                                                <li class="collection-item">
+                                                    <div class="card newsCard" style="overflow: visible;">
+                                                        <div class="card-image waves-effect waves-block waves-light activator georgeBustLt"
+                                                             style="background-image: url(
+                                                                     {% get_static_prefix %}{{ new.thumb_pic }});"></div>
+                                                        <div class="card-content">
+                                                            <span class="card-title activator grey-text text-darken-4">{{ new.title }}</span>
+                                                            <p><a href="{% url 'news' new.id %}" class="news-btn-txt">Перейти
+                                                                к статье</a></p>
+                                                        </div>
+                                                        <div class="card-reveal">
                                                     <span class="card-title grey-text text-darken-4">
                                                         {{ new.title }}
                                                         <i class="material-icons right">close</i>
                                                     </span>
-                                                    <p class="card_p">{{ new.title }}</p>
-                                                    <p><a href="{% url 'news' new.id %}" class="news-btn-txt">Перейти
-                                                        к статье</a></p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    {% endfor %}
-                                {% else %}
-                                    <h5 class="no-live">No news...</h5>
-                                {% endif %}
+                                                            <p class="card_p">{{ new.title }}</p>
+                                                            <p><a href="{% url 'news' new.id %}" class="news-btn-txt">Перейти
+                                                                к статье</a></p>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            {% endfor %}
+                                        {% else %}
+                                            <h5 class="no-live">No news...</h5>
+                                        {% endif %}
+                                    </div>
+                                </ul>
                             </div>
-                        </ul>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-</div>
 
-<footer>
-    <div class="container footer">
-        <div class="foot-left">
-            <div class="social">
-                <a href="https://vk.com/ollogg"><i class="fab fa-vk footer-icons"></i></a>
-            </div>
-            <div class="license">
-                Copyright © OLLO.GG 2019 ALL Rights Reserved
-            </div>
-            <div class="advance">
-                advancement by maked.me
-            </div>
-            <hr>
-            <div class="license">
-                <a href="mailto:ollo@maked.me">ollo@maked.me</a>
+    <footer>
+        <div class="container footer">
+            <div class="foot-left">
+                <div class="social">
+                    <a href="https://vk.com/ollogg"><i class="fab fa-vk footer-icons"></i></a>
+                </div>
+                <div class="license">
+                    Copyright © OLLO.GG 2019 ALL Rights Reserved
+                </div>
+                <div class="advance">
+                    advancement by maked.me
+                </div>
+                <hr>
+                <div class="license">
+                    <a href="mailto:ollo@maked.me">ollo@maked.me</a>
+                </div>
             </div>
         </div>
-    </div>
-</footer>
+    </footer>
 </div>
 
 <script type="text/javascript" src="{% static 'ollo_mainapp/libs/material/js/materialize.min.js' %}"></script>

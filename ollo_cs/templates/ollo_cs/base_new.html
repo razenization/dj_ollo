@@ -1,0 +1,119 @@
+{% load static %}
+{% load index_extras %}
+{#{% get_streams match.match_id %}#}
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link type="text/css" rel="stylesheet" href="{% static 'ollo_mainapp/libs/material/css/materialize.min.css' %}"
+          media="screen,projection"/>
+    <link href="https://fonts.googleapis.com/css?family=Bebas+Neue|Open+Sans:400,700&display=swap&subset=cyrillic"
+          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'ollo_mainapp/css/style.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'ollo_mainapp/css/header-style.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'ollo_mainapp/libs/fontawesome/css/all.min.css' %}">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" rel="stylesheet">
+    <title>ollo.gg</title>
+    <link type="text/css" rel="stylesheet" href="{% static 'ollo_mainapp/css/fonts.css' %}"/>
+    <link type="text/css" rel="stylesheet" href="{% static 'ollo_mainapp/css/live-style.css' %}"/>
+    <link type="text/css" rel="stylesheet" href="{% static 'ollo_mainapp/css/stream-style.css' %}"/>
+    <link type="text/css" rel="stylesheet" href="{% static 'ollo_mainapp/css/bans-style.css' %}"/>
+</head>
+
+<body>
+
+<div class="all-with-footer">
+    <div class="body">
+        <div class="header__main">
+            <div class="container__head">
+
+                <div class="header__inner">
+                    <div class="header-logo" id="headerNavLink">
+                        <img src="{% static 'ollo_mainapp/images/main_logo1.png' %}" alt="ollo.gg" style="width: 100%;">
+                    </div>
+
+                    <a href="/" class="main__nav__item__mobile">Матчи</a>
+                    <a href="{% url 'results' %}" class="main__nav__item__mobile">Результаты</a>
+
+                    <div class="nav" id="nav">
+                        <a href="/" class="nav__item">Новости<span class="soon">бета</span></a>
+                        <a href="/" class="nav__item">Матчи</a>
+                        <a href="{% url 'results' %}" class="nav__item">Результаты</a>
+                        <a class="nav__item themeSwitchMob">Сменить тему</a>
+                        <a class="nav__item soundVolumeMob" on="true">Выключить звук</a>
+                        <a href="/" class="nav__item">Аналитика<span class="soon">скоро</span></a>
+                        <a class="nav__item">Статистика<span class="soon">скоро</span></a>
+                        <a class="nav__item">Оценка пиков<span class="soon">скоро</span></a>
+                        <div class="ui-control uiControlHide">
+                            <i class="material-icons volume" id="themeSwitch">brightness_7</i>
+                            <i class="material-icons delim">remove</i>
+                            <i class="material-icons volume soundVolume" id="soundVolume" on="true">volume_up</i>
+                        </div>
+
+                    </div>
+                    <button class="nav__toggle " id="nav__toggle" type="button">
+                        <span class="nav__toggle__item">Menu</span>
+                    </button>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content1">
+            <div class="container">
+                <div class="main-content">
+                    <div class="main-content-inner">
+                        <div class="LEFT-BAR">
+                            {% block leftbar %}
+                            {% endblock %}
+                        </div>
+                        <div class="CENTER">
+                            {% block center %}
+                            {% endblock %}
+                        </div>
+                        <div class="RIGHT-BAR">
+                            {% block rightbar %}
+                            {% endblock %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <footer>
+        <div class="container footer">
+            <div class="foot-left">
+                <div class="social">
+                    <a href="https://vk.com/ollogg"><i class="fab fa-vk footer-icons"></i></a>
+                    <!--                <img src="images/Icons/telega.png" alt="">-->
+                </div>
+                <div class="license">
+                    Copyright © OLLO.GG 2019 ALL Rights Reserved
+                </div>
+                <div class="advance">
+                    advancement by maked.me
+                </div>
+                <hr>
+                <div class="license">
+                    <a href="mailto:ollo@maked.me">ollo@maked.me</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+<script type="text/javascript" src="{% static 'ollo_mainapp/libs/material/js/materialize.min.js' %}"></script>
+{#<script type="text/javascript" src="{% static 'ollo_mainapp/js/functions.js' %}"></script>#}
+<script type="text/javascript">
+    Resize();
+</script>
+{#<script type="text/javascript" src="{% static 'ollo_mainapp/js/init.js' %}"></script>#}
+{#<script type="text/javascript" src="{% static 'ollo_mainapp/js/purecookie.js' %}"></script>#}
+<script src="{% static 'ollo_mainapp/js/livemap.js' %}"></script>
+</div>
+</body>
+</html>

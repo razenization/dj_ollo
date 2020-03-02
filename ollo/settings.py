@@ -38,11 +38,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'ollo_mainapp',
+    'ollo_cs',
     'django_cron',
+    'channels',
     # 'rest_framework',
     # 'rest_framework.authtoken',
     # 'djoser',
 ]
+
+ASGI_APPLICATION = "ollo.routing.application"
 
 # REST_FRAMEWORK = {
 #     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -60,12 +64,14 @@ INSTALLED_APPS = [
 # }
 
 CRON_CLASSES = [
-    "ollo_mainapp.cron.CreateTeams",
+    # "ollo_mainapp.cron.CreateTeams",
     # "ollo_mainapp.cron.GetUpcoming",
     # "ollo_mainapp.cron.CheckIfLiveEnded",
     # "ollo_mainapp.cron.GetLiveMatchesData",
     # "ollo_mainapp.cron.GetLiveStatsForMatches",
     # "ollo_mainapp.cron.ClearPreMatches",
+    "ollo_cs.cron.GetUpcoming",
+    "ollo_cs.cron.GetLiveGoing",
 ]
 
 MIDDLEWARE = [

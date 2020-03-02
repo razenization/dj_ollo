@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+{% extends 'ollo_cs/base_new.html' %}
+{% load static %}
+{% load cs_tags %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% block leftbar %}
+    <div class="statistics-bar">
+        <div class="statistics-bar__item">
+            <h2 class="leftbar-title">Статистика</h2>
+            <img src="{{ match.team_set.all.0.logo }}" alt="" class="team-logo-view team1Pic">
+            <h7>{{ match.team_set.all.0.winrate }}</h7>
+            <img src="{{ match.team_set.all.1.logo }}" alt="" class="team-logo-view team2Pic">
+            <h7>{{ match.team_set.all.1.winrate }}</h7>
+        </div>
+        <div class="statistics-bar__item">
+            <h2 class="leftbar-title">Ранги команд</h2>
+            <img src="{{ match.team_set.all.0.logo }}" alt="" class="team-logo-view team1Pic">
+            <h7>#{{ match.team_set.all.0.rank }}</h7>
+            <img src="{{ match.team_set.all.1.logo }}" alt="" class="team-logo-view team2Pic">
+            <h7>#{{ match.team_set.all.1.rank }}</h7>
+            {#                            <canvas id="myRating" class="chart pie_chart chartjs-render-monitor" width="240" height="120" style="display: block;"></canvas>#}
+        </div>
+    </div>
+    <div class="streams">
+        <h2 class="leftbar-title">Трансляции:</h2>
+        <div id="streamsList">
+            {#            {% with stream_list=match.match_id|get_streams %}#}
+            {#                {% if stream_list %}#}
+            {#                    <ul>#}
+            {#                        {% for stream in stream_list %}#}
+            {#                            <li>{{ stream }}</li>#}
+            {#                        {% endfor %}#}
+            {#                    </ul>#}
+            {#                {% else %}#}
+            {#                    <span class="no-streems">Список трансляций пуст...</span>#}
+            {#                {% endif %}#}
+            {#            {% endwith %}#}
+        </div>
+    </div>
+    <div class="news">
+        <h2 class="leftbar-title">Новости</h2>
+        <div id="lastNews">
+            {% if news %}
+                {% for new in news %}
+                    <a href="{% url 'news' new.id %}" class="news-item news-item-light-dark">
+                        <span class="news-text">OG Seed сыграет с Team Singularity в полуфинале Maincast Winter Brawl</span>
+                        <div class="news-bg"
+                             style="background-image: url({% get_static_prefix %}{{ new.thumb_pic }});"></div>
+                    </a>
+                {% endfor %}
+            {% else %}
+                <span class="no-streems">Новостей пока нет...</span>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+{% block center %}
+    {% if match.is_live %}
+        <div class="main-block">
+        <h3 class="main-block-title" id="bookMaker">{{ match.event }}</h3>
+        <div class="score">
+            <div class="score-inner">
+                <div class="score-item">
+                    <a href="{% url 'team' match.team_set|get_id:0 %}">{{ match.get_first_team_name }}</a>
+                    <span class="team-name team1Name">{{ match.get_first_team_name }}</span>
+                    <img src="{% get_static_prefix %}{{ match.get_first_team_logo }}" alt=""
+                         class="team-logo_big_big team1Pic">
+                    <span id="team1Score" class="score-number">{{ match.team1_score }}</span>
+                </div>
+                <div class="score-item score-item_2">
+                    <span class="match-info match-info_type" id="bestOf">{{ match.best_of }}</span>
+                    <span class="match-info match-info_time" id="time">{{ match.get_game_time }}</span>
+                    <span class="match-info match-info_date" id="startMatch"></span>
+                </div>
+                <div class="score-item ">
+                    <span id="team2Score" class="score-number">{{ match.team2_score }}</span>
+                    <img src="{% get_static_prefix %}{{ match.get_second_team_logo }}" alt=""
+                         class="team-logo_big_big team2Pic">
+                    <span class="team-name team2Name">{{ match.get_second_team_name }}</span>
+                    <a href="{% url 'team' match.team_set|get_id:1 %}">{{ match.get_second_team_name }}</a>
+                </div>
+                {% if match.radiant_lead > 0 %}
+                    <div class="nw nw-left">
+                {% elif match.radiant_lead < 0 %}
+                    <div class="nw nw-right">
+                {% endif %}
+                <span>
+                                                    Преимущество
+                                                    <i class="fas fa-arrow-up" style="margin-right: 5px"></i>
+                                                    <span style="display: flex; align-items: center; margin-left: 20px;">
+                                                        <i class="material-icons">show_chart</i>
+                                                        {{ match.radiant_lead|cut:"-" }}
+                                                    </span>
+                                                </span>
+                </div>
+                </div>
+            </div>
+            <canvas id="myChart" class="chart main_chart chartjs-render-monitor" style="display: block;"></canvas>
+        </div>
+        <div class="main-stream" id="mainStream">
+            <div class="accordion" id="accordionStream">
+                <h2 class="accordion-block-title">Текущая трансляция</h2>
+                <i id="trans-arrow" class="material-icons">arrow_drop_down</i>
+            </div>
+            <div class="panel" id="panel">
+                <div id="streamCur">
+                    <iframe id="player" type="text/html" frameborder="0" src="about:blank" scrolling="no"
+                            allowfullscreen="true" style="width: 100%; height: 320px;"></iframe>
+                </div>
+            </div>
+        </div>
+        <div class="players">
+            <span class="first-blood">Первая кровь: <span class="name-fblood" id="firstblood"></span></span>
+            <div class="players-inner">
+                <img src="{% get_static_prefix %}{{ match.team_set|get_logo:0 }}" alt=""
+                     class="team1-logo-players team1Pic">
+                <img src="{% get_static_prefix %}{{ match.team_set|get_logo:1 }}" alt=""
+                     class="team2-logo-players team2Pic">
+                <div class="team-1" id="team1Heroes">
+                    {% for player in match|get_live_players:0 %}
+                        <div class="players-item" style="height: 190px">
+                            <div class="player-info">
+                                <div class="info-title">
+                                    <span class="player-nick">{{ player.nickname }}</span>
+                                </div>
+                                <div class="player-hero player-hero_team2">
+                                    <img src="{% get_hero_logo player.hero_id %}">
+                                    {% for item in player|get_player_items %}
+                                        <img src="{% get_item_logo item %}" class="hero-item">
+                                    {% endfor %}
+                                </div>
+                                <div class="player-statistics">
+                                    <div class="statistics-item">
+                                        <img src="{% static 'ollo_mainapp/images/util/sword.png' %}" class="iconDark"
+                                             alt="">
+                                        <span class="kills-number">{{ player.kills }}</span>
+                                    </div>
+                                    <div class="statistics-item">
+                                        <img src="{% static 'ollo_mainapp/images/util/skull.png' %}" class="iconDark"
+                                             alt="">
+                                        <span class="death-number">{{ player.deaths }}</span>
+                                    </div>
+                                    <div class="statistics-item">
+                                        <img src="{% static 'ollo_mainapp/images/util/line-chart.png' %}"
+                                             class="iconDark"
+                                             alt="">
+                                        <span class="chart-number">{{ player.nw }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="delimiter"></div>
+                <div class="team-2" id="team2Heroes">
+                    {% for player in match|get_live_players:1 %}
+                        <div class="players-item" style="height: 190px">
+                            <div class="player-info player-info_team2">
+                                <div class="info-title info-title-team2">
+                                    <span class="player-nick">{{ player.nickname }}</span>
+                                </div>
+                                <div class="player-hero player-hero_team2">
+                                    <img src="{% get_hero_logo player.hero_id %}">
+                                    {% for item in player|get_player_items %}
+                                        <img src="{% get_item_logo item %}" class="hero-item">
+                                    {% endfor %}
+                                </div>
+                                <div class="player-statistics player-statistics_team2">
+                                    <div class="statistics-item">
+                                        <img src="{% static 'ollo_mainapp/images/util/sword.png' %}" class="iconDark"
+                                             alt="">
+                                        <span class="kills-number">{{ player.kills }}</span>
+                                    </div>
+                                    <div class="statistics-item">
+                                        <img src="{% static 'ollo_mainapp/images/util/skull.png' %}" class="iconDark"
+                                             alt="">
+                                        <span class="death-number">{{ player.deaths }}</span>
+                                    </div>
+                                    <div class="statistics-item">
+                                        <img src="{% static 'ollo_mainapp/images/util/line-chart.png' %}"
+                                             class="iconDark"
+                                             alt="">
+                                        <span class="chart-number">{{ player.nw }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <a class="btn btn-default" href="{% url 'add_comment' match.id %}">Add comment</a>
+        {% for comment in match.comments.all %}
+            <div class="comment">
+                <div class="date">{{ comment.created_date }}</div>
+                <strong>{{ comment.author }}</strong>
+                <p>{{ comment.text|linebreaks }}</p>
+            </div>
+        {% empty %}
+            <p>No comments here yet :(</p>
+        {% endfor %}
+    {% else %}
+        <div class="main-block">
+        <h3 class="main-block-title" id="bookMaker">{{ match.event }}</h3>
+        <div class="score">
+            <div class="score-inner">
+                <div class="score-item">
+                    <span class="team-name team1Name">{{ match.team_set.all.0.name }}</span>
+                    <img src="{{ match.team_set.all.0.logo }}" alt=""
+                         class="team-logo_big_big team1Pic">
+                </div>
+                <div class="score-item score-item_2">
+                    <span class="match-info match-info_type" id="bestOf">{{ match.best_of|upper }}</span>
+                    {% with start_time=match.start_date|get_local_time %}
+                        <span class="match-info match-info_date"
+                              id="startMatch">{{ start_time.day|zfill:2 }}.{{ start_time.month|zfill:2 }}</span>
+                        <span class="match-info match-info_date"
+                              id="startMatch">{{ start_time.hour|zfill:2 }}:{{ start_time.minute|zfill:2 }}</span>
+                    {% endwith %}
+                </div>
+                <div class="score-item ">
+                    <img src="{{ match.team_set.all.1.logo }}" alt=""
+                         class="team-logo_big_big team2Pic">
+                    <span class="team-name team2Name">{{ match.team_set.all.1.name }}</span>
+                </div>
+            </div>
+            <canvas id="myChart" class="chart main_chart chartjs-render-monitor" style="display: block;"></canvas>
+        </div>
+        <div class="players">
+            <div class="players-inner">
+                <img src="{{ match.team_set.all.0.logo }}" alt=""
+                     class="team1-logo-players team1Pic">
+                <img src="{{ match.team_set.all.1.logo }}" alt=""
+                     class="team2-logo-players team2Pic">
+                <div class="team-1" id="team1Heroes">
+                    {% if match.team_set.all.0.players %}
+                        {% for player in match.team_set.all.0.players.all %}
+                            <div class="player-info player-info_team2">
+                                <div class="info-title info-title-team2">
+                                    <span class="player-nick">{{ player.nickname }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        {% if match.team_set.all.0.players.all.count < 5 %}
+                            {% for i in match.team_set.all.0.players.all.count|add:"-5"|get_counter %}
+                                <div class="player-info player-info_team2">
+                                    <div class="info-title info-title-team2">
+                                        <span class="player-nick">?</span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% else %}
+                        <div class="player-info player-info_team2">
+                            <div class="info-title info-title-team2">
+                                <span class="player-nick">Для этой команды нет зарегистрированных игроков.</span>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="delimiter"></div>
+                <div class="team-2" id="team2Heroes">
+                    {% if match.team_set.all.1.players %}
+                        {% for player in match.team_set.all.1.players.all %}
+                            <div class="player-info player-info_team2">
+                                <div class="info-title info-title-team2">
+                                    <span class="player-nick">{{ player.nickname }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        {% if match.team_set.all.1.players.all.count < 5 %}
+                            {% for i in match.team_set.all.1.players.all.count|add:"-5"|get_counter %}
+                                <div class="player-info player-info_team2">
+                                    <div class="info-title info-title-team2">
+                                        <span class="player-nick">?</span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% else %}
+                        <div class="player-info player-info_team2">
+                            <div class="info-title info-title-team2">
+                                <span class="player-nick">Для этой команды нет зарегистрированных игроков.</span>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+{% block rightbar %}
+
+{% endblock %}
+</body>
+</html>
