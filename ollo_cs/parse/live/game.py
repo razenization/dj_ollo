@@ -71,17 +71,27 @@ class Scoreboard:
         return self.counter_terrorists
 
 
-def sb_callb(event):
-    print(event)
+# def sb_callb(ws, event):
+#     print(event)
+#
+#
+# def event_callb(ws, sb_event):
+#     for ter in sb_event.terrorists.players:
+#         ws.send("NICK: {}, ADR: {}, KILLS: {}, DEATHS: {}, ASSISTS: {}".format(
+#             ter.nick, round(ter.adr, 1), ter.score, ter.deaths, ter.assists).encode('utf-8'))
+#
+#     print("******************")
+#     for ct in sb_event.counter_terrorists.players:
+#         ws.send("NICK: {}, ADR: {}, KILLS: {}, DEATHS: {}, ASSISTS: {}".format(
+#             ct.nick, round(ct.adr, 1), ct.score, ct.deaths, ct.assists).encode('utf-8'))
 
 
-def event_callb(sb_event):
-    for ter in sb_event.terrorists.players:
-        print("NICK: {}, ADR: {}, KILLS: {}, DEATHS: {}, ASSISTS: {}".format(
-            ter.nick, round(ter.adr, 1), ter.score, ter.deaths, ter.assists)
-        )
-    print("******************")
-    for ct in sb_event.counter_terrorists.players:
-        print("NICK: {}, ADR: {}, KILLS: {}, DEATHS: {}, ASSISTS: {}".format(
-            ct.nick, round(ct.adr, 1), ct.score, ct.deaths, ct.assists)
-        )
+# def event_callb(ws, sb_event):
+#     for ter in sb_event.terrorists.players:
+#         ws.send(json.dumps(dict(message="NICK: {}, ADR: {}, KILLS: {}, DEATHS: {}, ASSISTS: {}".format(
+#             ter.nick, round(ter.adr, 1), ter.score, ter.deaths, ter.assists).encode('utf-8'))))
+#
+#     print("******************")
+#     for ct in sb_event.counter_terrorists.players:
+#         ws.send(json.dumps(dict(message="NICK: {}, ADR: {}, KILLS: {}, DEATHS: {}, ASSISTS: {}".format(
+#             ct.nick, round(ct.adr, 1), ct.score, ct.deaths, ct.assists).encode('utf-8'))))

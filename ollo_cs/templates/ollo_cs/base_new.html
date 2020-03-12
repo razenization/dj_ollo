@@ -21,6 +21,8 @@
     <link type="text/css" rel="stylesheet" href="{% static 'ollo_mainapp/css/live-style.css' %}"/>
     <link type="text/css" rel="stylesheet" href="{% static 'ollo_mainapp/css/stream-style.css' %}"/>
     <link type="text/css" rel="stylesheet" href="{% static 'ollo_mainapp/css/bans-style.css' %}"/>
+    {% block head %}
+    {% endblock %}
 </head>
 
 <body>
@@ -106,14 +108,11 @@
         </div>
     </footer>
 </div>
-<script type="text/javascript" src="{% static 'ollo_mainapp/libs/material/js/materialize.min.js' %}"></script>
 {#<script type="text/javascript" src="{% static 'ollo_mainapp/js/functions.js' %}"></script>#}
-<script type="text/javascript">
-    Resize();
-</script>
 {#<script type="text/javascript" src="{% static 'ollo_mainapp/js/init.js' %}"></script>#}
 {#<script type="text/javascript" src="{% static 'ollo_mainapp/js/purecookie.js' %}"></script>#}
-<script src="{% static 'ollo_mainapp/js/livemap.js' %}"></script>
 </div>
+<script type="text/javascript" src="{% static 'ollo_mainapp/libs/material/js/materialize.min.js' %}"></script>
+<script src="{% static '/ollo_cs/libs/jquery-3.4.1.min.js' %}"></script>
 </body>
 </html>

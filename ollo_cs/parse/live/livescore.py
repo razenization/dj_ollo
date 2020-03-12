@@ -1,12 +1,17 @@
+import datetime
 import json
+import traceback
+
 import socketio
-import sys
-import requests
+import websocket
 
-
-from bs4 import BeautifulSoup
 from urllib.parse import urlparse
+
+from django.utils import timezone
+
+from ollo_cs.models import Team, IndexMatchInfo
 from .game import Player, Team, Scoreboard
+from django.db import close_old_connections
 
 
 class Livescore:
@@ -40,12 +45,76 @@ class Livescore:
     TEAM_TERRORIST = "TERRORIST"
     TEAM_COUNTER_TERRORIST = "CT"
 
-    def __init__(
-        self, list_id=None, scoreboard_callback=None, event_callback=None
-    ):
+    def event_callb(self, event):
+        print(event)
+
+    def sb_callb(self, sb_event):
+        def unpack_team(team):
+            for idx in range(len(team['players'])):
+                pl = team['players'].pop(0)
+                team['players'].append(pl.__dict__)
+
+            return team
+
+        unpacked = sb_event.__dict__
+
+        unpacked['terrorists'] = unpack_team(unpacked['terrorists'].__dict__)
+        unpacked['counter_terrorists'] = unpack_team(unpacked['counter_terrorists'].__dict__)
+
+        self.info_model.map_name = unpacked['map_name']
+        self.info_model.current_round = unpacked['current_round']
+        self.info_model.bomb_planted = unpacked['bomb_planted']
+
+        if int(unpacked['terrorists']['score']) != self.info_model.t_score:
+            winner = self.info_model.t_name
+        elif int(unpacked['counter_terrorists']['score']) != self.info_model.t_score:
+            winner = self.info_model.ct_name
+        else:
+            winner = None
+        self.info_model.t_score = unpacked['terrorists']['score']
+        self.info_model.ct_score = unpacked['counter_terrorists']['score']
+
+        self.info_model.terrorists = json.dumps(dict(players=unpacked['terrorists']['players']))
+        self.info_model.counter_terrorists = json.dumps(dict(players=unpacked['counter_terrorists']['players']))
+
+        self.info_model.save()
+        close_old_connections()
+        if winner:
+            if 16 in [int(unpacked['terrorists']['score']), int(unpacked['counter_terrorists']['score'])]:
+                if int(unpacked['terrorists']['score']) + int(unpacked['counter_terrorists']['score']) <= 30:
+                    self.info_model.ended(winner)
+
+            elif int(unpacked['counter_terrorists']['score']) + int(unpacked['terrorists']['score']) > 30:
+                if max(int(unpacked['counter_terrorists']['score']), int(unpacked['terrorists']['score'])) % 3 == 1:
+                    if abs(int(unpacked['terrorists']['score']) - int(unpacked['counter_terrorists']['score'])) > 1:
+                        self.info_model.ended(winner)
+
+        try:
+            self.ws.send(json.dumps(unpacked))
+        except:
+            print(traceback.format_exc())
+            try:
+                if self.ws.connected:
+                    self.ws.close()
+                    self.ws = websocket.create_connection("ws://localhost:8000/cs/ws/matches/{}/".format(self.list_id))
+                    self.ws.send(json.dumps(unpacked))
+                else:
+                    self.ws = websocket.create_connection("ws://localhost:8000/cs/ws/matches/{}/".format(self.list_id))
+                    self.ws.send(json.dumps(unpacked))
+            except:
+                pass
+
+    def __init__(self, list_id=None):
         self.list_id = list_id
-        self.sb_callback = scoreboard_callback
-        self.event_callback = event_callback
+        self.sb_callback = self.sb_callb
+        self.event_callback = self.event_callb
+        self.info_model = IndexMatchInfo.objects.get(match__match_id=self.list_id)
+        # self.ws = websockets
+        print('before ws ** ** ** ** ** ** **')
+        try:
+            self.ws = websocket.create_connection("ws://localhost:8000/cs/ws/matches/{}/".format(self.list_id))
+        except Exception as e:
+            print('Socket conn', e)
 
     def from_url(self, url):
         parsed = urlparse(url)
@@ -59,17 +128,17 @@ class Livescore:
 
         raise Exception("Invalid URL")
 
-    def socket(self):
-        sio = socketio.Client()
+    def socket(self, *args):
+        self.sio = socketio.Client()
 
-        @sio.event
+        @self.sio.event
         def connect():
             print("connection established")
             ready_data = {"listId": self.list_id}
 
-            sio.emit("readyForMatch", json.dumps(ready_data))
+            self.sio.emit("readyForMatch", json.dumps(ready_data))
 
-        @sio.event
+        @self.sio.event
         def log(data):
             log_data = json.loads(data)
 
@@ -107,6 +176,30 @@ class Livescore:
                             event_data["counterTerroristScore"],
                             event_data["terroristScore"],
                         )
+
+                        self.ws.send(json.dumps(
+                            dict(event="ROUND_END")
+                        ))
+
+                    elif event == self.EVENT_ROUND_START:
+                        self.info_model.round_time_delta = timezone.localtime(timezone.now()) + datetime.timedelta(seconds=115)
+                        self.info_model.save()
+                        close_old_connections()
+
+                        self.ws.send(json.dumps(
+                            dict(event="ROUND_START")
+                        ))
+
+                    elif event == self.EVENT_BOMB_PLANTED:
+                        self.info_model.bomb_planted = True
+                        self.info_model.round_time_delta = timezone.localtime(timezone.now()) + datetime.timedelta(seconds=40)
+                        self.info_model.save()
+                        close_old_connections()
+
+                        self.ws.send(json.dumps(
+                            dict(event="BOMB_PLANTED")
+                        ))
+
                     else:
                         print("Uncaught event: {!s}".format(event))
                         print(event_data)
@@ -115,7 +208,7 @@ class Livescore:
                     if event_string is not None:
                         self.event_callback(event_string)
 
-        @sio.event
+        @self.sio.event
         def scoreboard(data):
             players = {
                 self.TEAM_COUNTER_TERRORIST: [],
@@ -158,6 +251,11 @@ class Livescore:
                 players=players[self.TEAM_COUNTER_TERRORIST],
             )
 
+            self.info_model.t_name = data["terroristTeamName"]
+            self.info_model.ct_name = data["ctTeamName"]
+            self.info_model.save()
+            close_old_connections()
+
             scoreboard = Scoreboard(
                 map_name=data["mapName"],
                 bomb_planted=data["bombPlanted"],
@@ -169,11 +267,18 @@ class Livescore:
             if self.sb_callback is not None:
                 self.sb_callback(scoreboard)
 
-        @sio.event
+        @self.sio.on('error')
+        def error():
+            print("disconnected from server")
+
+        # Connect to the scorebot URI.
+        self.sio.connect("https://scorebot-secure.hltv.org")
+
+        @self.sio.event
         def disconnect():
             print("disconnected from server")
 
         # Connect to the scorebot URI.
-        sio.connect("https://scorebot-secure.hltv.org")
+        self.sio.connect("https://scorebot-secure.hltv.org")
 
-        return sio
+        return self.sio

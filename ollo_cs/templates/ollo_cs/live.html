@@ -151,7 +151,7 @@
                                     <span id="team2Score" class="score-number"></span>
                                     <img src="{% get_static_prefix %}{{ match.get_second_team_logo }}" alt="" class="team-logo_big_big team2Pic">
 {#                                    <span class="team-name team2Name">{{ match.get_second_team_name }}</span>#}
-                                    <a href="{% url 'team' match.team_set|get_id:1 %}">{{ match.get_second_team_name }}</a>
+                                    <a href="{% url 'team' match.team_set.all.1.team_id %}">{{ match.get_second_team_name }}</a>
                                 </div>
                                 {% if match.radiant_lead > 0 %}
                                 <div class="nw nw-left">
@@ -183,7 +183,7 @@
                         </div>
                     </div>
                     <div class="players">
-{#                        <span class="first-blood">Первая кровь: <span class="name-fblood" id="firstblood"></span></span>#}
+                        <span class="first-blood"></span>
                         <div class="players-inner">
                             <img src="{% get_static_prefix %}{{ match.team_set|get_logo:0 }}" alt="" class="team1-logo-players team1Pic">
                             <img src="{% get_static_prefix %}{{ match.team_set|get_logo:1 }}" alt="" class="team2-logo-players team2Pic">
@@ -370,12 +370,12 @@
     matchSocket.onmessage = function(e) {
         var data = JSON.parse(e.data);
         var message = data['message'];
-        console.log("gg wp");
-        {#document.querySelector('#chat-log').value += (message + '\n');#}
+        console.log("gg wp" + message);
+        document.querySelector('.first-blood').value += (message + '\n');
     };
 
-    chatSocket.onclose = function(e) {
-        console.error('Chat socket closed unexpectedly');
+    matchSocket.onclose = function(e) {
+        console.error('Match socket closed.');
     };
 
     document.querySelector('#chat-message-input').focus();
@@ -385,15 +385,15 @@
         }
     };
 
-    document.querySelector('#chat-message-submit').onclick = function(e) {
-        var messageInputDom = document.querySelector('#chat-message-input');
-        var message = messageInputDom.value;
-        chatSocket.send(JSON.stringify({
-            'message': message
-        }));
-
-        messageInputDom.value = '';
-    };
+    {#document.querySelector('#chat-message-submit').onclick = function(e) {#}
+    {#    var messageInputDom = document.querySelector('#chat-message-input');#}
+    {#    var message = messageInputDom.value;#}
+    {#    chatSocket.send(JSON.stringify({#}
+    {#        'message': message#}
+    {#    }));#}
+    {##}
+    {#    messageInputDom.value = '';#}
+    {#};#}
 </script>
 </div>
 </body>

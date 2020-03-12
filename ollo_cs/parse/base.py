@@ -1,4 +1,6 @@
 import re
+import traceback
+
 import requests
 import datetime
 from bs4 import BeautifulSoup
@@ -87,17 +89,17 @@ def top_players():
     players = page.find_all("div", {"class": "col"})[0]
     playersArray = []
     for player in players.find_all("div", {"class": "top-x-box standard-box"}):
-        playerObj = {}
-        playerObj['country'] = player.find_all('img')[1]['alt']
-        buildName = player.find('img', {'class': 'img'})['alt'].split("'")
-        playerObj['name'] = buildName[0].rstrip() + buildName[2]
-        playerObj['nickname'] = player.find('a', {'class': 'name'}).text
-        playerObj['rating'] = player.find('div', {'class': 'rating'}).find('span', {'class': 'bold'}).text.encode(
+        player_obj = {}
+        player_obj['country'] = player.find_all('img')[1]['alt']
+        build_name = player.find('img', {'class': 'img'})['alt'].split("'")
+        player_obj['name'] = build_name[0].rstrip() + build_name[2]
+        player_obj['nickname'] = player.find('a', {'class': 'name'}).text
+        player_obj['rating'] = player.find('div', {'class': 'rating'}).find('span', {'class': 'bold'}).text.encode(
             'utf8')
-        playerObj['maps-played'] = player.find('div', {'class': 'average gtSmartphone-only'}).find('span', {
+        player_obj['maps-played'] = player.find('div', {'class': 'average gtSmartphone-only'}).find('span', {
             'class': 'bold'}).text
 
-        playersArray.append(playerObj)
+        playersArray.append(player_obj)
     return playersArray
 
 
@@ -152,10 +154,10 @@ def _get_current_lineup(player_anchors):
     players = []
     for player_anchor in player_anchors[0:5]:
         player = {}
-        buildName = player_anchor.find("img", {"class": "container-width"})["alt"].split('\'')
+        build_name = player_anchor.find("img", {"class": "container-width"})["alt"].split('\'')
         player['country'] = \
-        player_anchor.find("div", {"class": "teammate-info standard-box"}).find("img", {"class": "flag"})["alt"]
-        player['name'] = buildName[0].rstrip() + buildName[2]
+            player_anchor.find("div", {"class": "teammate-info standard-box"}).find("img", {"class": "flag"})["alt"]
+        player['name'] = build_name[0].rstrip() + build_name[2]
         player['nickname'] = player_anchor.find("div", {"class": "teammate-info standard-box"}).find("div", {
             "class": "text-ellipsis"}).text
         player['maps-played'] = int(re.search(r'\d+',
@@ -173,11 +175,12 @@ def _get_historical_lineup(player_anchors):
     players = []
     for player_anchor in player_anchors[5::]:
         player = {}
-        buildName = player_anchor.find("img", {"class": "container-width"})["alt"].split('\'')
+        build_name = player_anchor.find("img", {"class": "container-width"})["alt"].split('\'')
         player['country'] = \
-        player_anchor.find("div", {"class": "teammate-info standard-box"}).find("img", {"class": "flag"})["alt"].encode(
-            'utf8')
-        player['name'] = buildName[0].rstrip() + buildName[2]
+            player_anchor.find("div", {"class": "teammate-info standard-box"}).find("img", {"class": "flag"})[
+                "alt"].encode(
+                'utf8')
+        player['name'] = build_name[0].rstrip() + build_name[2]
         player['nickname'] = player_anchor.find("div", {"class": "teammate-info standard-box"}).find("div", {
             "class": "text-ellipsis"}).text
         player['maps-played'] = int(re.search(r'\d+',
@@ -194,41 +197,160 @@ def get_matches():
 
     matchdays = upcomingmatches.find_all("div", {"class": "match-day"})
 
-    for match in matchdays[:2]:
-        matchDetails = match.find_all("table", {"class": "table"})
+    for match in matchdays[:1]:
+        try:
+            match_details = match.find_all("table", {"class": "table"})
 
-        for getMatch in matchDetails:
-            matchObj = {}
+            for getMatch in match_details:
+                match_obj = {}
 
-            href = getMatch.previousSibling.get('href')
+                href = getMatch.previousSibling.get('href')
 
-            matchObj['id'] = re.search("\\d+", href).group(0)
+                match_obj['id'] = re.search("\\d+", href).group(0)
 
-            matchObj['date'] = match.find("span", {"class": "standard-headline"}).text
-            matchObj['time'] = getMatch.find("td", {"class": "time"}).text.lstrip().rstrip()
+                match_obj['date'] = match.find("span", {"class": "standard-headline"}).text
+                match_obj['time'] = getMatch.find("td", {"class": "time"}).text.lstrip().rstrip()
 
-            if getMatch.find("td", {"class": "placeholder-text-cell"}):
-                matchObj['event'] = getMatch.find("td", {"class": "placeholder-text-cell"}).text
-            elif getMatch.find("td", {"class": "event"}):
-                matchObj['event'] = getMatch.find("td", {"class": "event"}).text
-            else:
-                matchObj['event'] = None
+                if getMatch.find("td", {"class": "placeholder-text-cell"}):
+                    match_obj['event'] = getMatch.find("td", {"class": "placeholder-text-cell"}).text
+                elif getMatch.find("td", {"class": "event"}):
+                    match_obj['event'] = getMatch.find("td", {"class": "event"}).text
+                else:
+                    match_obj['event'] = None
 
-            if getMatch.find_all("td", {"class": "team-cell"}):
-                cells = getMatch.find_all("td", {"class": "team-cell"})
-                team1_name = cells[0].text.lstrip().rstrip()
-                team1_logo = cells[0].find('img').get('src').lstrip().rstrip()
-                team1_id = re.search("\\d+", team1_logo).group(0).lstrip().rstrip()
+                if getMatch.find_all("td", {"class": "team-cell"}):
+                    cells = getMatch.find_all("td", {"class": "team-cell"})
+                    try:
+                        team1_name = cells[0].text.lstrip().rstrip()
+                        team1_logo = cells[0].find('img').get('src').lstrip().rstrip()
+                        team1_id = re.search("\\d+", team1_logo).group(0).lstrip().rstrip()
 
-                team2_name = cells[1].text.lstrip().rstrip()
-                team2_logo = cells[1].find('img').get('src').lstrip().rstrip()
-                team2_id = re.search("\\d+", team2_logo).group(0).lstrip().rstrip()
+                        team2_name = cells[1].text.lstrip().rstrip()
+                        team2_logo = cells[1].find('img').get('src').lstrip().rstrip()
+                        team2_id = re.search("\\d+", team2_logo).group(0).lstrip().rstrip()
+
+                        team1_page = get_parsed_page("https://www.hltv.org/team/{}/{}".format(
+                            team1_id, team1_name.replace(" ", "-")))
+
+                        team1_stats = team1_page.find_all('div', {'class': 'profile-team-stat'})
+                        try:
+                            team1_rank = re.search("\\d+", team1_stats[0].text).group(0)
+                        except:
+                            team1_rank = None
+                        try:
+                            team1_avg = re.search("\\d+\.\\d", team1_stats[2].text).group(0)
+                        except:
+                            team1_avg = None
+                        team1_players = set_players(team1_page)
+
+                        team1_wr_page = get_parsed_page("https://www.hltv.org/team/{}/{}#tab-matchesBox".format(
+                            team1_id, team1_name.replace(" ", "-")))
+
+                        try:
+                            team1_wr = team1_wr_page.find('div', {'class': 'highlighted-stats-box'}).find_all(
+                                'div', {'class': 'highlighted-stat'})[1].find('div').text.replace("%", "")
+                            try:
+                                team1_wr = float(team1_wr)
+                            except:
+                                team1_wr = None
+                        except:
+                            team1_wr = None
+
+                        team2_page = get_parsed_page("https://www.hltv.org/team/{}/{}".format(
+                            team2_id, team2_name.replace(" ", "-")))
+
+                        team2_stats = team2_page.find_all('div', {'class': 'profile-team-stat'})
+                        try:
+                            team2_rank = re.search("\\d+", team2_stats[0].text).group(0)
+                        except:
+                            team2_rank = None
+                        try:
+                            team2_avg = re.search("\\d+\.\\d", team2_stats[2].text).group(0)
+                        except:
+                            team2_avg = None
+                        team2_players = set_players(team2_page)
+
+                        team2_wr_page = get_parsed_page("https://www.hltv.org/team/{}/{}#tab-matchesBox".format(
+                            team2_id, team2_name.replace(" ", "-")))
+
+                        try:
+                            team2_wr = team2_wr_page.find('div', {'class': 'highlighted-stats-box'}).find_all(
+                                'div', {'class': 'highlighted-stat'})[1].find('div').text.replace("%", "")
+                            try:
+                                team2_wr = float(team2_wr)
+                            except:
+                                team2_wr = None
+                        except:
+                            team2_wr = None
+
+                        match_obj['team1'] = dict(name=team1_name, logo=team1_logo, rank=team1_rank, avg=team1_avg,
+                                                  players=team1_players, wr=team1_wr)
+                        match_obj['team2'] = dict(name=team2_name, logo=team2_logo, rank=team2_rank, avg=team2_avg,
+                                                  players=team2_players, wr=team2_wr)
+                    except AttributeError:
+                        print("Can't get required data for one or several match teams")
+                        continue
+                else:
+                    match_obj['team1'] = None
+                    match_obj['team2'] = None
+
+                if getMatch.find('td', {'class': 'star-cell'}):
+                    match_obj['bestof'] = getMatch.find("td", {"class": "star-cell"}).text.lstrip().rstrip()
+                else:
+                    match_obj['bestof'] = None
+                matches_list.append(match_obj)
+        except:
+            print(traceback.format_exc())
+
+    return matches_list
+
+
+def get_lives():
+    matches = get_parsed_page("http://www.hltv.org/matches/")
+    matches_list = []
+
+    lives = matches.find_all("div", {"class": "live-match"})
+
+    for live in lives:
+        match_obj = {}
+        try:
+            href = live.find('a').get('href')
+        except AttributeError:
+            continue
+        match_obj['id'] = re.search("\\d+", href).group(0)
+        match_obj['date'] = "{}-{}-{}".format(datetime.datetime.today().year, datetime.datetime.today().month,
+                                              datetime.datetime.today().day)
+
+        if live.find("div", {"class": "event-name"}):
+            match_obj['event'] = live.find("div", {"class": "event-name"}).text
+        else:
+            match_obj['event'] = None
+
+        match_page = get_parsed_page(f"https://hltv.org{href}")
+
+        match_obj['time'] = match_page.find("div", {"class": "time"}).text.lstrip().rstrip()
+
+        if live.find_all("tr"):
+            cells = live.find_all("tr")
+            try:
+                match_obj['bestof'] = re.search("\\d", cells[0].find("td").text).group(0)
+
+                team1_name = cells[1].find("span").text.lstrip().rstrip()
+                team1_logo = cells[1].find('img').get('src').lstrip().rstrip()
+                team1_id = team1_logo.split('/')[-1]
+
+                team2_name = cells[2].find("span").text.lstrip().rstrip()
+                team2_logo = cells[2].find('img').get('src').lstrip().rstrip()
+                team2_id = team2_logo.split('/')[-1]
 
                 team1_page = get_parsed_page("https://www.hltv.org/team/{}/{}".format(
                     team1_id, team1_name.replace(" ", "-")))
 
                 team1_stats = team1_page.find_all('div', {'class': 'profile-team-stat'})
-                team1_rank = re.search("\\d+", team1_stats[0].text).group(0)
+                try:
+                    team1_rank = re.search("\\d+", team1_stats[0].text).group(0)
+                except:
+                    team1_rank = None
                 try:
                     team1_avg = re.search("\\d+\.\\d", team1_stats[2].text).group(0)
                 except:
@@ -241,6 +363,8 @@ def get_matches():
                 try:
                     team1_wr = team1_wr_page.find('div', {'class': 'highlighted-stats-box'}).find_all(
                         'div', {'class': 'highlighted-stat'})[1].find('div').text.replace("%", "")
+                    if not str(team1_wr).isdigit():
+                        team1_wr = None
                 except:
                     team1_wr = None
 
@@ -248,7 +372,10 @@ def get_matches():
                     team2_id, team2_name.replace(" ", "-")))
 
                 team2_stats = team2_page.find_all('div', {'class': 'profile-team-stat'})
-                team2_rank = re.search("\\d+", team2_stats[0].text).group(0)
+                try:
+                    team2_rank = re.search("\\d+", team2_stats[0].text).group(0)
+                except:
+                    team2_rank = None
                 try:
                     team2_avg = re.search("\\d+\.\\d", team2_stats[2].text).group(0)
                 except:
@@ -261,22 +388,23 @@ def get_matches():
                 try:
                     team2_wr = team2_wr_page.find('div', {'class': 'highlighted-stats-box'}).find_all(
                         'div', {'class': 'highlighted-stat'})[1].find('div').text.replace("%", "")
+                    if not str(team2_wr).isdigit():
+                        team2_wr = None
                 except:
                     team2_wr = None
 
-                matchObj['team1'] = dict(name=team1_name, logo=team1_logo, rank=team1_rank, avg=team1_avg,
-                                         players=team1_players, wr=team1_wr)
-                matchObj['team2'] = dict(name=team2_name, logo=team2_logo, rank=team2_rank, avg=team2_avg,
-                                         players=team2_players, wr=team2_wr)
-            else:
-                matchObj['team1'] = None
-                matchObj['team2'] = None
+                match_obj['team1'] = dict(name=team1_name, logo=team1_logo, rank=team1_rank, avg=team1_avg,
+                                          players=team1_players, wr=team1_wr)
+                match_obj['team2'] = dict(name=team2_name, logo=team2_logo, rank=team2_rank, avg=team2_avg,
+                                          players=team2_players, wr=team2_wr)
+            except AttributeError:
+                print("Can't get required data for one or several match teams")
+                continue
+        else:
+            match_obj['team1'] = None
+            match_obj['team2'] = None
 
-            if getMatch.find('td', {'class': 'star-cell'}):
-                matchObj['bestof'] = getMatch.find("td", {"class": "star-cell"}).text.lstrip().rstrip()
-            else:
-                matchObj['bestof'] = None
-            matches_list.append(matchObj)
+        matches_list.append(match_obj)
 
     return matches_list
 
@@ -287,9 +415,7 @@ def get_matches():
 #     lives = matches.find("div", {"class": ""}).find_all("")
 #
 #     for match in lives:
-#         matchDetails = match.find_all("table", {"class": "table"})
-
-
+#         match_details = match.find_all("table", {"class": "table"})
 
 
 def get_results():
@@ -300,38 +426,38 @@ def get_results():
     pastresults = results.find_all("div", {"class": "results-holder"})
 
     for result in pastresults:
-        resultDiv = result.find_all("div", {"class": "result-con"})
+        result_div = result.find_all("div", {"class": "result-con"})
 
-        for res in resultDiv:
-            getRes = res.find("div", {"class": "result"}).find("table")
+        for res in result_div:
+            get_res = res.find("div", {"class": "result"}).find("table")
 
-            resultObj = {}
+            result_obj = {}
 
-            if (res.parent.find("span", {"class": "standard-headline"})):
-                resultObj['date'] = res.parent.find("span", {"class": "standard-headline"}).text
+            if res.parent.find("span", {"class": "standard-headline"}):
+                result_obj['date'] = res.parent.find("span", {"class": "standard-headline"}).text
             else:
                 dt = datetime.date.today()
-                resultObj['date'] = str(dt.day) + '/' + str(dt.month) + '/' + str(dt.year)
+                result_obj['date'] = str(dt.day) + '/' + str(dt.month) + '/' + str(dt.year)
 
-            if (res.find("td", {"class": "placeholder-text-cell"})):
-                resultObj['event'] = res.find("td", {"class": "placeholder-text-cell"}).text
-            elif (res.find("td", {"class": "event"})):
-                resultObj['event'] = res.find("td", {"class": "event"}).text
+            if res.find("td", {"class": "placeholder-text-cell"}):
+                result_obj['event'] = res.find("td", {"class": "placeholder-text-cell"}).text
+            elif res.find("td", {"class": "event"}):
+                result_obj['event'] = res.find("td", {"class": "event"}).text
             else:
-                resultObj['event'] = None
+                result_obj['event'] = None
 
-            if (res.find_all("td", {"class": "team-cell"})):
-                resultObj['team1'] = res.find_all("td", {"class": "team-cell"})[0].text.lstrip().rstrip()
-                resultObj['team1score'] = converters.to_int(
+            if res.find_all("td", {"class": "team-cell"}):
+                result_obj['team1'] = res.find_all("td", {"class": "team-cell"})[0].text.lstrip().rstrip()
+                result_obj['team1score'] = converters.to_int(
                     res.find("td", {"class": "result-score"}).find_all("span")[0].text.lstrip().rstrip())
-                resultObj['team2'] = res.find_all("td", {"class": "team-cell"})[1].text.lstrip().rstrip()
-                resultObj['team2score'] = converters.to_int(
+                result_obj['team2'] = res.find_all("td", {"class": "team-cell"})[1].text.lstrip().rstrip()
+                result_obj['team2score'] = converters.to_int(
                     res.find("td", {"class": "result-score"}).find_all("span")[1].text.lstrip().rstrip())
             else:
-                resultObj['team1'] = None
-                resultObj['team2'] = None
+                result_obj['team1'] = None
+                result_obj['team2'] = None
 
-            results_list.append(resultObj)
+            results_list.append(result_obj)
 
     return results_list
 
@@ -377,7 +503,6 @@ def get_results_by_date(start_date, end_date):
             break
 
     return results_list
-
 
 # if __name__ == "__main__":
 # import pprint

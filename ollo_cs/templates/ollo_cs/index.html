@@ -44,21 +44,29 @@
                                                             LIVE
                                                             <i class="material-icons">brightness_1</i>
                                                         </div>
+                                                    {% with teams=match.team_set.all|dictsort:'pk' %}
                                                         <div class="live-name-and-logo">
-                                                            <img src="{{ match.team_set.all.0.logo }}" class="picImg ">
-                                                            <h5>{{ match.team_set.all.0.name }}</h5>
+                                                            <img src="{{ teams.0.logo }}" class="picImg ">
+                                                            <h5>{{ teams.0 }}</h5>
                                                         </div>
                                                         <div class="score-view">
                                                             <div class="live-teams-score">
-                                                                <h5>{{ match.team_set.all.0.score }}</h5>
-                                                                <h5 class="delim-score">:</h5>
-                                                                <h5>{{ match.team_set.all.1.score }}</h5>
+                                                                {% if teams.0.name == match.index.t_name %}
+                                                                    <h5>{{ match.index.t_score }}</h5>
+                                                                    <h5 class="delim-score">:</h5>
+                                                                    <h5>{{ match.index.ct_score }}</h5>
+                                                                {% else %}
+                                                                    <h5>{{ match.index.ct_score }}</h5>
+                                                                    <h5 class="delim-score">:</h5>
+                                                                    <h5>{{ match.index.t_score }}</h5>
+                                                                {% endif %}
                                                             </div>
                                                         </div>
                                                         <div class="live-name-and-logo">
-                                                            <h5>{{ match.team_set.all.1.name }}</h5>
-                                                            <img src="{{ match.team_set.all.1.logo }}" class="picImg ">
+                                                            <h5>{{ teams.1 }}</h5>
+                                                            <img src="{{ teams.1.logo }}" class="picImg ">
                                                         </div>
+                                                    {% endwith %}
                                                     </div>
                                                 </a>
                                             </li>
@@ -84,10 +92,11 @@
                                                             <div class="time-m">{{ start_time.day|zfill:2 }}.{{ start_time.month|zfill:2 }} {{ start_time.hour|zfill:2 }}:{{ start_time.minute|zfill:2 }}</div>
                                                         {% endwith %}
                                                     </div>
+                                                {% with teams=match.team_set.all|dictsort:'pk' %}
                                                     <div class="view live-score-view">
                                                         <div class="live-name-and-logo">
-                                                            <img src="{{ match.team_set.all.0.logo }}" class="picImg ">
-                                                            <h5>{{ match.team_set.all.0.name }}</h5>
+                                                            <img src="{{ teams.0.logo }}" class="picImg ">
+                                                            <h5>{{ teams.0.name }}</h5>
                                                         </div>
                                                         <div class="score-view">
                                                             <div class="live-teams-score">
@@ -95,10 +104,11 @@
                                                             </div>
                                                         </div>
                                                         <div class="live-name-and-logo">
-                                                            <h5>{{ match.team_set.all.1.name }}</h5>
-                                                            <img src="{{ match.team_set.all.1.logo }}" class="picImg ">
+                                                            <h5>{{ teams.1.name }}</h5>
+                                                            <img src="{{ teams.1.logo }}" class="picImg ">
                                                         </div>
                                                     </div>
+                                                {% endwith %}
                                                 </a>
                                             </li>
                                         {% endfor %}

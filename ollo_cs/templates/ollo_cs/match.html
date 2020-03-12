@@ -7,40 +7,42 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    {% block head %}
+        <link type="text/css" rel="stylesheet" href="{% static 'ollo_cs/css/match-style.css' %}">
+    {% endblock %}
 </head>
 <body>
 {% block leftbar %}
+    {% with teams=match.team_set.all|dictsort:'pk' %}
     <div class="statistics-bar">
         <div class="statistics-bar__item">
             <h2 class="leftbar-title">Статистика</h2>
-            <img src="{{ match.team_set.all.0.logo }}" alt="" class="team-logo-view team1Pic">
-            <h7>{{ match.team_set.all.0.winrate }}</h7>
-            <img src="{{ match.team_set.all.1.logo }}" alt="" class="team-logo-view team2Pic">
-            <h7>{{ match.team_set.all.1.winrate }}</h7>
+            <img src="{{ teams.0.logo }}" alt="" class="team-logo-view team1Pic">
+            <h7>{{ teams.0.winrate }}</h7>
+            <img src="{{ teams.1.logo }}" alt="" class="team-logo-view team2Pic">
+            <h7>{{ teams.1.winrate }}</h7>
         </div>
         <div class="statistics-bar__item">
             <h2 class="leftbar-title">Ранги команд</h2>
-            <img src="{{ match.team_set.all.0.logo }}" alt="" class="team-logo-view team1Pic">
-            <h7>#{{ match.team_set.all.0.rank }}</h7>
-            <img src="{{ match.team_set.all.1.logo }}" alt="" class="team-logo-view team2Pic">
-            <h7>#{{ match.team_set.all.1.rank }}</h7>
+            <img src="{{ teams.0.logo }}" alt="" class="team-logo-view team1Pic">
+            <h7>#{{ teams.0.rank }}</h7>
+            <img src="{{ teams.1.logo }}" alt="" class="team-logo-view team2Pic">
+            <h7>#{{ teams.1.rank }}</h7>
             {#                            <canvas id="myRating" class="chart pie_chart chartjs-render-monitor" width="240" height="120" style="display: block;"></canvas>#}
         </div>
     </div>
     <div class="streams">
         <h2 class="leftbar-title">Трансляции:</h2>
         <div id="streamsList">
-            {#            {% with stream_list=match.match_id|get_streams %}#}
-            {#                {% if stream_list %}#}
-            {#                    <ul>#}
-            {#                        {% for stream in stream_list %}#}
-            {#                            <li>{{ stream }}</li>#}
-            {#                        {% endfor %}#}
-            {#                    </ul>#}
-            {#                {% else %}#}
-            {#                    <span class="no-streems">Список трансляций пуст...</span>#}
-            {#                {% endif %}#}
-            {#            {% endwith %}#}
+            {% if stream_list %}
+                <ul>
+                    {% for stream in stream_list %}
+                        <li>{{ stream }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <span class="no-streems">Список трансляций пуст...</span>
+            {% endif %}
         </div>
     </div>
     <div class="news">
@@ -59,50 +61,285 @@
             {% endif %}
         </div>
     </div>
+    {% endwith %}
 {% endblock %}
 {% block center %}
     {% if match.is_live %}
+        {% with teams=match.team_set.all|dictsort:'pk' %}
         <div class="main-block">
-        <h3 class="main-block-title" id="bookMaker">{{ match.event }}</h3>
-        <div class="score">
-            <div class="score-inner">
-                <div class="score-item">
-                    <a href="{% url 'team' match.team_set|get_id:0 %}">{{ match.get_first_team_name }}</a>
-                    <span class="team-name team1Name">{{ match.get_first_team_name }}</span>
-                    <img src="{% get_static_prefix %}{{ match.get_first_team_logo }}" alt=""
-                         class="team-logo_big_big team1Pic">
-                    <span id="team1Score" class="score-number">{{ match.team1_score }}</span>
-                </div>
-                <div class="score-item score-item_2">
-                    <span class="match-info match-info_type" id="bestOf">{{ match.best_of }}</span>
-                    <span class="match-info match-info_time" id="time">{{ match.get_game_time }}</span>
-                    <span class="match-info match-info_date" id="startMatch"></span>
-                </div>
-                <div class="score-item ">
-                    <span id="team2Score" class="score-number">{{ match.team2_score }}</span>
-                    <img src="{% get_static_prefix %}{{ match.get_second_team_logo }}" alt=""
-                         class="team-logo_big_big team2Pic">
-                    <span class="team-name team2Name">{{ match.get_second_team_name }}</span>
-                    <a href="{% url 'team' match.team_set|get_id:1 %}">{{ match.get_second_team_name }}</a>
-                </div>
-                {% if match.radiant_lead > 0 %}
-                    <div class="nw nw-left">
-                {% elif match.radiant_lead < 0 %}
-                    <div class="nw nw-right">
-                {% endif %}
-                <span>
-                                                    Преимущество
-                                                    <i class="fas fa-arrow-up" style="margin-right: 5px"></i>
-                                                    <span style="display: flex; align-items: center; margin-left: 20px;">
-                                                        <i class="material-icons">show_chart</i>
-                                                        {{ match.radiant_lead|cut:"-" }}
-                                                    </span>
-                                                </span>
-                </div>
+            <h3 class="main-block-title" id="bookMaker">{{ match.event }}</h3>
+            <div class="score">
+                <div class="score-inner">
+                    <div class="score-item">
+                        <a href="{% url 'team' teams.0.team_id %}">{{ teams.0.name }}</a>
+{#                        <span class="team-name team1Name">{{ teams.0.name }}</span>#}
+                        <img src="{{ teams.0.logo }}" alt=""
+                             class="team-logo_big_big team1Pic">
+                        <span id="team1Score"
+                              class="score-number">{% if match.index.t_name == teams.0.name %}
+                            {{ match.index.t_score }}{% else %}{{ match.index.ct_score }}{% endif %}</span>
+                    </div>
+                    <div class="score-item score-item_2">
+                        <span class="match-info match-info_type" id="bestOf">{{ match.best_of|upper }}</span>
+                        <span class="match-info match-info_time" id="time">{{ match.get_game_time }}</span>
+                        <span class="match-info match-info_date" id="startMatch"></span>
+                    </div>
+                    <div class="score-item ">
+                        <span id="team2Score"
+                              class="score-number">{% if match.index.t_name == teams.1.name %}
+                            {{ match.index.t_score }}{% else %}{{ match.index.ct_score }}{% endif %}</span>
+                        <img src="{{ teams.1.logo }}" alt=""
+                             class="team-logo_big_big team2Pic">
+{#                        <span class="team-name team2Name">{{ teams.1.name }}</span>#}
+                        <a href="{% url 'team' teams.1.team_id %}">{{ teams.1.name }}</a>
+                    </div>
                 </div>
             </div>
-            <canvas id="myChart" class="chart main_chart chartjs-render-monitor" style="display: block;"></canvas>
         </div>
+        <div class="standard-box backgroundContainer"
+{#             style="background-image: url('https://static.hltv.org/images/scoreboardmaps/de_nuke.png');">#}
+             style="background-color: red;">
+            <div class="content">
+                <div class="topbarBg">
+                    <div class="round">
+                        <span class="roundText">
+                            R: <span class="currentRoundText">{{ match.index.current_round }}</span> - <span
+                                class="currentMapText">{{ match.index.map_name|cut:'de_'|capfirst }}</span>
+                        </span>
+                    </div>
+                    <div class="score scoreText">
+                        <div class="livescore-scoreText">{{ match.index.ct_score }} : {{ match.index.t_score }}</div>
+{#                        <div>:</div>#}
+{#                        <div class="tScore">{{ match.info.t_score }}</div>#}
+                    </div>
+                    <div class="time">
+                        <div class="timeText"><span>0:00</span></div>
+                        {#                        <div><img src="https://static.hltv.org/images/scoreboard2/bomb.png"></div>#}
+                    </div>
+                </div>
+                <table class="team-ct">
+                    <thead class="ctTeamHeaderBg">
+                    <tr class="row">
+                        {% with ct_team=match.index.ct_name|get_team_by_name %}
+                            <td class="identityColumns" colspan="2">
+                                <div class="teamName"><img src="{{ ct_team.logo }}" alt=""
+                                                           width="25px" height="25px">{{ ct_team.name }}</div>
+                            </td>
+                            <td class="statCell weaponCell " title="Buy">
+                                {#                            <img src="/img/static/scoreboard/weapons/buy.png">#}
+                            </td>
+                            <td class="statCell hpCell topCell " title="Health">
+                                {#                            <img src="/img/static/scoreboard/weapons/health.png">#}
+                            </td>
+                            <td class="statCell armorCell " title="Armor">
+                                {#                            <img src="/img/static/scoreboard/weapons/kevlar_helmet.png">#}
+                            </td>
+                            <td class="statCell moneyCell " title="Money">$</td>
+                            <td class="statCell killCell" title="Kills">K</td>
+                            <td class="statCell assistCell" title="Assists">A</td>
+                            <td class="statCell deathCell" title="Deaths">D</td>
+                            <td class="statCell adrCell" title="Average damage / round">ADR</td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% with player_list=match.index.counter_terrorists|json_unpack %}
+                                {% for player in player_list.players %}
+                                    <tr class="row player ctPlayerBg-{{ forloop.counter }}">
+                                        <td class=" identityColumns">
+                                            <div style="display: none;"><img width="20px" height="20px" alt=""></div>
+                                            <div class="nameCell" title="{{ player.name }}">{{ player.nick }}</div>
+                                        </td>
+                                        <td class="statCell defuseKit">
+                                            {% if player.has_defusekit %}
+                                                <img src="{% static 'images/sb/defkit.png' %}">
+                                            {% else %}
+                                                <span></span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="statCell weaponCell ">
+                                            {% if player.primary_weapon %}
+                                                <img src="{{ player.primary_weapon|weapon_img }}">
+                                            {% else %}
+                                                <span></span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="statCell hpCell bar ">
+                                            <div class="hp-column"><span class="hp-text">{{ player.hp }}</span>
+                                                <div class="hp-remaining" style="width: 100%;"></div>
+                                                <div class="hp-full" style="width: 0;"></div>
+                                            </div>
+                                        </td>
+                                        <td class="statCell armorCell ">
+                                            {% if player.helmet %}
+                                                <img src="{% static 'images/sb/helmet.png' %}">
+                                            {% else %}
+                                                {% if player.kevlar %}
+                                                    <img src="{% static 'images/sb/kevlar.png' %}">
+                                                {% else %}
+                                                    <span></span>
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                        <td class="statCell moneyCell ">${{ player.money }}</td>
+                                        <td class="statCell killCell">{{ player.score }}</td>
+                                        <td class="statCell assistCell">{{ player.assists }}</td>
+                                        <td class="statCell deathCell">{{ player.deaths }}</td>
+                                        <td class="statCell adrCell">{{ player.adr|round_num:1 }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endwith %}
+                            </tbody>
+                        {% endwith %}
+                </table>
+                {#                <div class=" roundHistory">#}
+                {#                    <div class=" firstHalf">#}
+                {#                        <div class="roundHistoryLine roundHistoryLineSideCT">#}
+                {#                            <div class="historyIcon"><img#}
+                {#                                    src="https://static.hltv.org/images/scoreboard2/emptyHistory.svg"></div>#}
+                {#                            <div class="historyIcon"><img#}
+                {#                                    src="https://static.hltv.org/images/scoreboard2/emptyHistory.svg"></div>#}
+                {#                            <div class="historyIcon"><img#}
+                {#                                    src="https://static.hltv.org/images/scoreboard2/bomb_defused.svg"></div>#}
+                {#                            <div class="historyIcon"><img src="https://static.hltv.org/images/scoreboard2/ct_win.svg">#}
+                {#                            </div>#}
+                {#                            <div class="historyIcon"><img src="https://static.hltv.org/images/scoreboard2/ct_win.svg">#}
+                {#                            </div>#}
+                {#                            <div class="historyIcon"><img#}
+                {#                                    src="https://static.hltv.org/images/scoreboard2/emptyHistory.svg"></div>#}
+                {#                            <div class="historyIcon"><img#}
+                {#                                    src="https://static.hltv.org/images/scoreboard2/emptyHistory.svg"></div>#}
+                {#                            <div class="historyIcon"><img#}
+                {#                                    src="https://static.hltv.org/images/scoreboard2/emptyHistory.svg"></div>#}
+                {#                            <div class="historyIcon"><img src="https://static.hltv.org/images/scoreboard2/ct_win.svg">#}
+                {#                            </div>#}
+                {#                            <div class="historyIcon"><img#}
+                {#                                    src="https://static.hltv.org/images/scoreboard2/stopwatch.svg"></div>#}
+                {#                            <div class="historyIcon"><img#}
+                {#                                    src="https://static.hltv.org/images/scoreboard2/emptyHistory.svg"></div>#}
+                {#                            <div class="historyIcon"><img#}
+                {#                                    src="https://static.hltv.org/images/scoreboard2/emptyHistory.svg"></div>#}
+                {#                            <div class="historyIcon"><img#}
+                {#                                    src="https://static.hltv.org/images/scoreboard2/emptyHistory.svg"></div>#}
+                {#                            <div class="historyIcon"><img#}
+                {#                                    src="https://static.hltv.org/images/scoreboard2/emptyHistory.svg"></div>#}
+                {#                            <div class="historyIcon"><img#}
+                {#                                    src="https://static.hltv.org/images/scoreboard2/emptyHistory.svg"></div>#}
+                {#                        </div>#}
+                {#                        <div class="roundHistoryLine roundHistoryLineSideTERRORIST">#}
+                {#                            <div class="historyIcon"><img src="https://static.hltv.org/images/scoreboard2/t_win.svg">#}
+                {#                            </div>#}
+                {#                            <div class="historyIcon"><img src="https://static.hltv.org/images/scoreboard2/t_win.svg">#}
+                {#                            </div>#}
+                {#                            <div class="historyIcon"><img#}
+                {#                                    src="https://static.hltv.org/images/scoreboard2/emptyHistory.svg"></div>#}
+                {#                            <div class="historyIcon"><img#}
+                {#                                    src="https://static.hltv.org/images/scoreboard2/emptyHistory.svg"></div>#}
+                {#                            <div class="historyIcon"><img#}
+                {#                                    src="https://static.hltv.org/images/scoreboard2/emptyHistory.svg"></div>#}
+                {#                            <div class="historyIcon"><img#}
+                {#                                    src="https://static.hltv.org/images/scoreboard2/bomb_exploded.svg"></div>#}
+                {#                            <div class="historyIcon"><img#}
+                {#                                    src="https://static.hltv.org/images/scoreboard2/bomb_exploded.svg"></div>#}
+                {#                            <div class="historyIcon"><img#}
+                {#                                    src="https://static.hltv.org/images/scoreboard2/bomb_exploded.svg"></div>#}
+                {#                            <div class="historyIcon"><img#}
+                {#                                    src="https://static.hltv.org/images/scoreboard2/emptyHistory.svg"></div>#}
+                {#                            <div class="historyIcon"><img#}
+                {#                                    src="https://static.hltv.org/images/scoreboard2/emptyHistory.svg"></div>#}
+                {#                            <div class="historyIcon"><img#}
+                {#                                    src="https://static.hltv.org/images/scoreboard2/emptyHistory.svg"></div>#}
+                {#                            <div class="historyIcon"><img#}
+                {#                                    src="https://static.hltv.org/images/scoreboard2/emptyHistory.svg"></div>#}
+                {#                            <div class="historyIcon"><img#}
+                {#                                    src="https://static.hltv.org/images/scoreboard2/emptyHistory.svg"></div>#}
+                {#                            <div class="historyIcon"><img#}
+                {#                                    src="https://static.hltv.org/images/scoreboard2/emptyHistory.svg"></div>#}
+                {#                            <div class="historyIcon"><img#}
+                {#                                    src="https://static.hltv.org/images/scoreboard2/emptyHistory.svg"></div>#}
+                {#                        </div>#}
+                {#                    </div>#}
+                {#                    <div class="secondHalf">#}
+                {#                        <div class="roundHistoryLine roundHistoryLineSideCT"></div>#}
+                {#                        <div class="roundHistoryLine roundHistoryLineSideTERRORIST"></div>#}
+                {#                    </div>#}
+                {#                </div>#}
+                <table class="team-t">
+                    <thead class="tTeamHeaderBg">
+                    <tr class="row">
+                        {% with t_team=match.index.t_name|get_team_by_name %}
+                            <td class="identityColumns" colspan="2">
+                                <div class="teamName"><img src="{{ t_team.logo }}" alt=""
+                                                           width="25px" height="25px">{{ t_team.name }}</div>
+                            </td>
+                            <td class="statCell weaponCell " title="Buy">
+                                {#                            <img src="/img/static/scoreboard/weapons/buy.png">#}
+                            </td>
+                            <td class="statCell hpCell topCell " title="Health">
+                                {#                            <img src="/img/static/scoreboard/weapons/health.png">#}
+                            </td>
+                            <td class="statCell armorCell " title="Armor">
+                                {#                            <img src="/img/static/scoreboard/weapons/kevlar_helmet.png">#}
+                            </td>
+                            <td class="statCell moneyCell " title="Money">$</td>
+                            <td class="statCell killCell" title="Kills">K</td>
+                            <td class="statCell assistCell" title="Assists">A</td>
+                            <td class="statCell deathCell" title="Deaths">D</td>
+                            <td class="statCell adrCell" title="Average damage / round">ADR</td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% with player_list=match.index.terrorists|json_unpack %}
+                                {% for player in player_list.players %}
+                                    <tr class="row player tPlayerBg-{{ forloop.counter }}">
+                                        <td class="identityColumns">
+                                            <div style="display: none;"><img width="20px" height="20px" alt=""></div>
+                                            <div class="nameCell" title="{{ player.name }}">{{ player.nick }}</div>
+                                        </td>
+                                        <td class="statCell defuseKit">
+                                            {% if player.has_defusekit %}
+                                                <img src="{% static 'images/sb/defkit.png' %}">
+                                            {% else %}
+                                                <span></span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="statCell weaponCell ">
+                                            {% if player.primary_weapon %}
+                                                <img src="{{ player.primary_weapon|weapon_img }}">
+                                            {% else %}
+                                                <span></span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="statCell hpCell bar ">
+                                            <div class="hp-column"><span class="hp-text">{{ player.hp }}</span>
+                                                <div class="hp-remaining" style="width: 100%;"></div>
+                                                <div class="hp-full" style="width: 0;"></div>
+                                            </div>
+                                        </td>
+                                        <td class="statCell armorCell ">
+                                            {% if player.helmet %}
+                                                <img src="{% static 'images/sb/helmet.png' %}">
+                                            {% else %}
+                                                {% if player.kevlar %}
+                                                    <img src="{% static 'images/sb/kevlar.png' %}">
+                                                {% else %}
+                                                    <span></span>
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                        <td class="statCell moneyCell ">${{ player.money }}</td>
+                                        <td class="statCell killCell">{{ player.score }}</td>
+                                        <td class="statCell assistCell">{{ player.assists }}</td>
+                                        <td class="statCell deathCell">{{ player.deaths }}</td>
+                                        <td class="statCell adrCell">{{ player.adr|round_num:1 }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endwith %}
+                            </tbody>
+                        {% endwith %}
+                </table>
+            </div>
+        </div>
+        {% endwith %}
         <div class="main-stream" id="mainStream">
             <div class="accordion" id="accordionStream">
                 <h2 class="accordion-block-title">Текущая трансляция</h2>
@@ -115,86 +352,7 @@
                 </div>
             </div>
         </div>
-        <div class="players">
-            <span class="first-blood">Первая кровь: <span class="name-fblood" id="firstblood"></span></span>
-            <div class="players-inner">
-                <img src="{% get_static_prefix %}{{ match.team_set|get_logo:0 }}" alt=""
-                     class="team1-logo-players team1Pic">
-                <img src="{% get_static_prefix %}{{ match.team_set|get_logo:1 }}" alt=""
-                     class="team2-logo-players team2Pic">
-                <div class="team-1" id="team1Heroes">
-                    {% for player in match|get_live_players:0 %}
-                        <div class="players-item" style="height: 190px">
-                            <div class="player-info">
-                                <div class="info-title">
-                                    <span class="player-nick">{{ player.nickname }}</span>
-                                </div>
-                                <div class="player-hero player-hero_team2">
-                                    <img src="{% get_hero_logo player.hero_id %}">
-                                    {% for item in player|get_player_items %}
-                                        <img src="{% get_item_logo item %}" class="hero-item">
-                                    {% endfor %}
-                                </div>
-                                <div class="player-statistics">
-                                    <div class="statistics-item">
-                                        <img src="{% static 'ollo_mainapp/images/util/sword.png' %}" class="iconDark"
-                                             alt="">
-                                        <span class="kills-number">{{ player.kills }}</span>
-                                    </div>
-                                    <div class="statistics-item">
-                                        <img src="{% static 'ollo_mainapp/images/util/skull.png' %}" class="iconDark"
-                                             alt="">
-                                        <span class="death-number">{{ player.deaths }}</span>
-                                    </div>
-                                    <div class="statistics-item">
-                                        <img src="{% static 'ollo_mainapp/images/util/line-chart.png' %}"
-                                             class="iconDark"
-                                             alt="">
-                                        <span class="chart-number">{{ player.nw }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-                <div class="delimiter"></div>
-                <div class="team-2" id="team2Heroes">
-                    {% for player in match|get_live_players:1 %}
-                        <div class="players-item" style="height: 190px">
-                            <div class="player-info player-info_team2">
-                                <div class="info-title info-title-team2">
-                                    <span class="player-nick">{{ player.nickname }}</span>
-                                </div>
-                                <div class="player-hero player-hero_team2">
-                                    <img src="{% get_hero_logo player.hero_id %}">
-                                    {% for item in player|get_player_items %}
-                                        <img src="{% get_item_logo item %}" class="hero-item">
-                                    {% endfor %}
-                                </div>
-                                <div class="player-statistics player-statistics_team2">
-                                    <div class="statistics-item">
-                                        <img src="{% static 'ollo_mainapp/images/util/sword.png' %}" class="iconDark"
-                                             alt="">
-                                        <span class="kills-number">{{ player.kills }}</span>
-                                    </div>
-                                    <div class="statistics-item">
-                                        <img src="{% static 'ollo_mainapp/images/util/skull.png' %}" class="iconDark"
-                                             alt="">
-                                        <span class="death-number">{{ player.deaths }}</span>
-                                    </div>
-                                    <div class="statistics-item">
-                                        <img src="{% static 'ollo_mainapp/images/util/line-chart.png' %}"
-                                             class="iconDark"
-                                             alt="">
-                                        <span class="chart-number">{{ player.nw }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
+
         <a class="btn btn-default" href="{% url 'add_comment' match.id %}">Add comment</a>
         {% for comment in match.comments.all %}
             <div class="comment">
@@ -206,13 +364,14 @@
             <p>No comments here yet :(</p>
         {% endfor %}
     {% else %}
+        {% with teams=match.team_set.all|dictsort:'pk' %}
         <div class="main-block">
         <h3 class="main-block-title" id="bookMaker">{{ match.event }}</h3>
         <div class="score">
             <div class="score-inner">
                 <div class="score-item">
-                    <span class="team-name team1Name">{{ match.team_set.all.0.name }}</span>
-                    <img src="{{ match.team_set.all.0.logo }}" alt=""
+                    <span class="team-name team1Name">{{ teams.0.name }}</span>
+                    <img src="{{ teams.0.logo }}" alt=""
                          class="team-logo_big_big team1Pic">
                 </div>
                 <div class="score-item score-item_2">
@@ -225,30 +384,30 @@
                     {% endwith %}
                 </div>
                 <div class="score-item ">
-                    <img src="{{ match.team_set.all.1.logo }}" alt=""
+                    <img src="{{ teams.1.logo }}" alt=""
                          class="team-logo_big_big team2Pic">
-                    <span class="team-name team2Name">{{ match.team_set.all.1.name }}</span>
+                    <span class="team-name team2Name">{{ teams.1.name }}</span>
                 </div>
             </div>
             <canvas id="myChart" class="chart main_chart chartjs-render-monitor" style="display: block;"></canvas>
         </div>
         <div class="players">
             <div class="players-inner">
-                <img src="{{ match.team_set.all.0.logo }}" alt=""
+                <img src="{{ teams.0.logo }}" alt=""
                      class="team1-logo-players team1Pic">
-                <img src="{{ match.team_set.all.1.logo }}" alt=""
+                <img src="{{ teams.1.logo }}" alt=""
                      class="team2-logo-players team2Pic">
                 <div class="team-1" id="team1Heroes">
-                    {% if match.team_set.all.0.players %}
-                        {% for player in match.team_set.all.0.players.all %}
+                    {% if teams.0.players %}
+                        {% for player in teams.0.players.all %}
                             <div class="player-info player-info_team2">
                                 <div class="info-title info-title-team2">
                                     <span class="player-nick">{{ player.nickname }}</span>
                                 </div>
                             </div>
                         {% endfor %}
-                        {% if match.team_set.all.0.players.all.count < 5 %}
-                            {% for i in match.team_set.all.0.players.all.count|add:"-5"|get_counter %}
+                        {% if teams.0.players.all.count < 5 %}
+                            {% for i in teams.0.players.all.count|add:"-5"|get_counter %}
                                 <div class="player-info player-info_team2">
                                     <div class="info-title info-title-team2">
                                         <span class="player-nick">?</span>
@@ -266,16 +425,16 @@
                 </div>
                 <div class="delimiter"></div>
                 <div class="team-2" id="team2Heroes">
-                    {% if match.team_set.all.1.players %}
-                        {% for player in match.team_set.all.1.players.all %}
+                    {% if teams.1.players %}
+                        {% for player in teams.1.players.all %}
                             <div class="player-info player-info_team2">
                                 <div class="info-title info-title-team2">
                                     <span class="player-nick">{{ player.nickname }}</span>
                                 </div>
                             </div>
                         {% endfor %}
-                        {% if match.team_set.all.1.players.all.count < 5 %}
-                            {% for i in match.team_set.all.1.players.all.count|add:"-5"|get_counter %}
+                        {% if teams.1.players.all.count < 5 %}
+                            {% for i in teams.1.players.all.count|add:"-5"|get_counter %}
                                 <div class="player-info player-info_team2">
                                     <div class="info-title info-title-team2">
                                         <span class="player-nick">?</span>
@@ -293,9 +452,133 @@
                 </div>
             </div>
         </div>
+        {% endwith %}
     {% endif %}
 {% endblock %}
 {% block rightbar %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <script src="{% static 'ollo_cs/js/counter.js' %}"></script>
+
+    <script>
+        {% with local=match.index.round_time_delta|get_local_time %}
+            timer.start(
+                {{ local.hour }},
+                {{ local.minute }},
+                {{ local.second }}
+            );
+        {% endwith %}
+    </script>
+
+    <script>
+        var matchId = "{{ match.id|escapejs }}";
+
+        var matchSocket = new WebSocket(
+            'ws://' + window.location.host +
+            '/cs/ws/matches/' + matchId + '/');
+
+        matchSocket.onmessage = function (e) {
+            var data = JSON.parse(e.data);
+            console.log(data);
+            {% with teams=match.team_set.all|dictsort:'pk' %}
+            try {
+                var json_pack = data['message'];
+                $('.currentRoundText').text(json_pack['current_round']);
+                $('.livescore-scoreText').text(json_pack['counter_terrorists']['score'] + " : " + json_pack['terrorists']['score']);
+                if (json_pack['terrorists']['name'] === "{{ teams.0.name|escapejs }}") {
+                    $('#team1Score').text(json_pack['terrorists']['score']);
+                    $('#team2Score').text(json_pack['counter_terrorists']['score']);
+                } else {
+                    $('#team1Score').text(json_pack['counter_terrorists']['score']);
+                    $('#team2Score').text(json_pack['terrorists']['score']);
+                }
+                let cts = json_pack['counter_terrorists']['players'];
+                for (i = 0; i < cts.length; i++) {
+                    let curPlayerSlot = $('.row.player.ctPlayerBg-' + (i + 1));
+                    if (!curPlayerSlot.length) {
+
+                    }
+                    {#$('.ct-team').find('tbody').clone().append('<div class="row player ctPlayerBg-"' + (i + 1) + '></div>');#}
+                    {#    $('.ct-team').find('tbody').append('<div class="row player ctPlayerBg-"' + (i + 1) + '></div>');#}
+                    curPlayerSlot.find('.nameCell').attr('title', cts[i]['name']);
+                    curPlayerSlot.find('.nameCell').text(cts[i]['nick']);
+                    if (cts[i]['has_defusekit']) {
+                        curPlayerSlot.find('td.statCell.defuseKit').html("<img src='{% get_static_prefix %}images/sb/defkit.png/>'");
+                    } else {
+                        curPlayerSlot.find('td.statCell.defuseKit').html("<span></span>");
+                    }
+                    if (cts[i]['primary_weapon']) {
+                        curPlayerSlot.find('td.statCell.weaponCell').html("<img src='" + "{% get_static_prefix %}images/sb/" + cts[i]['primary_weapon'] + ".png'/>");
+                    } else {
+                        curPlayerSlot.find('td.statCell.weaponCell').html("<span></span>");
+                    }
+                    curPlayerSlot.find('td.statCell.hpCell.bar').find('.hp-text').text(cts[i]['hp']);
+                    if (cts[i]['helmet']) {
+                        curPlayerSlot.find('td.statCell.armorCell').html("<img src='{% static 'images/sb/helmet.png' %}'/>");
+                    } else if (cts[i]['kevlar']) {
+                        curPlayerSlot.find('td.statCell.armorCell').html("<img src='{% static 'images/sb/kevlar.png' %}'/>");
+                    } else {
+                        curPlayerSlot.find('td.statCell.armorCell').html("<span></span>");
+                    }
+
+                    curPlayerSlot.find('td.statCell.moneyCell').text("$" + cts[i]['money']);
+                    curPlayerSlot.find('td.statCell.killCell').text(cts[i]['score']);
+                    curPlayerSlot.find('td.statCell.assistCell').text(cts[i]['assists']);
+                    curPlayerSlot.find('td.statCell.deathCell').text(cts[i]['deaths']);
+                    curPlayerSlot.find('td.statCell.adrCell').text(Number(cts[i]['adr']).toFixed(1));
+                }
+
+                let ters = json_pack['terrorists']['players'];
+                for (i = 0; i < ters.length; i++) {
+                    let curPlayerSlot = $('.row.player.tPlayerBg-' + (i + 1));
+                    curPlayerSlot.find('.nameCell').attr('title', ters[i]['name']);
+                    curPlayerSlot.find('.nameCell').text(ters[i]['nick']);
+                    if (ters[i]['primary_weapon']) {
+                        curPlayerSlot.find('td.statCell.weaponCell').html("<img src='" + "{% get_static_prefix %}images/sb/" + ters[i]['primary_weapon'] + ".png'/>");
+                    } else {
+                        curPlayerSlot.find('td.statCell.weaponCell').html("<span></span>");
+                    }
+                    curPlayerSlot.find('td.statCell.hpCell.bar').find('.hp-text').text(ters[i]['hp']);
+                    if (ters[i]['helmet']) {
+                        curPlayerSlot.find('td.statCell.armorCell').html("<img src='{% static 'images/sb/helmet.png' %}'/>");
+                    } else if (ters[i]['kevlar']) {
+                        curPlayerSlot.find('td.statCell.armorCell').html("<img src='{% static 'images/sb/kevlar.png' %}'/>");
+                    } else {
+                        curPlayerSlot.find('td.statCell.armorCell').html("<span></span>");
+                    }
+
+                    curPlayerSlot.find('td.statCell.moneyCell').text("$" + ters[i]['money']);
+                    curPlayerSlot.find('td.statCell.killCell').text(ters[i]['score']);
+                    curPlayerSlot.find('td.statCell.assistCell').text(ters[i]['assists']);
+                    curPlayerSlot.find('td.statCell.deathCell').text(ters[i]['deaths']);
+                    curPlayerSlot.find('td.statCell.adrCell').text(Number(ters[i]['adr']).toFixed(1));
+                }
+            } catch (e) {
+                console.log(e);
+                if (data['event'] === "ROUND_END") {
+                    {#console.log('round end')#}
+                    $('.timeText span').text('Round over');
+                    timer.stop();
+                }
+                if (data['event'] === "ROUND_START") {
+                    console.log('ROUND_START');
+                    let rSpan = $('.currentRoundText');
+                    rSpan.innerHTML = parseInt(rSpan.innerHTML) + 1;
+                    {#setIntervalAndExecuteCustom(counter, 1000, 115);#}
+                    timer.reset(115);
+                }
+                if (data['event'] === "BOMB_PLANTED") {
+                    console.log('BOMB_PLANTED');
+                    timer.reset(40);
+                }
+            }
+            {% endwith %}
+        };
+
+        matchSocket.onclose = function (e) {
+            console.error('Live socket closed unexpectedly');
+        };
+    </script>
 
 {% endblock %}
 </body>

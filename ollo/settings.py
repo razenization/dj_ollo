@@ -15,7 +15,6 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
@@ -26,7 +25,6 @@ SECRET_KEY = '@so+qj4j38uwz4n6o=_w6x030+fouk3c17pc@(8e9aajg=7s@c'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -41,6 +39,7 @@ INSTALLED_APPS = [
     'ollo_cs',
     'django_cron',
     'channels',
+    'django_q',
 ]
 
 ASGI_APPLICATION = 'ollo.routing.application'
@@ -78,6 +77,7 @@ CRON_CLASSES = [
     # "ollo_mainapp.cron.ClearPreMatches",
     "ollo_cs.cron.GetUpcoming",
     "ollo_cs.cron.GetLiveGoing",
+    # "ollo_cs.cron.TempCron",
 ]
 
 MIDDLEWARE = [
@@ -110,17 +110,31 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ollo.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'ollo_db',
+            'USER': 'main_ollo',
+            'PASSWORD': 'rnp442',
+            'HOST': '127.0.0.1',
+            'PORT': '6432',
+            # 'CONN_MAX_AGE': 0,
+        }
 }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'ollo_db',
+#         'USER': 'main_ollo',
+#         'PASSWORD': 'rnp442',
+#         'HOST': '127.0.0.1',
+#         'PORT': '5432',
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -140,7 +154,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
@@ -153,7 +166,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
