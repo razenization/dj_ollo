@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+{% load static %}
+{% load cs_tags %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700|Roboto:100,300,400,500|Titillium+Web:300&display=swap"
+          rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'v2/css/style.min.css' %}">
+    <link rel="stylesheet" href="{% static 'v2/other/slick/slick.css' %}">
+    <link rel="stylesheet" href="{% static 'v2/other/slick/slick-theme.css' %}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+
+    <!-- Useful meta tags -->
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="robots" content="index, follow">
+    <meta name="google" content="notranslate">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="description" content="">
+
+    <!-- Favicons -->
+    {#    <link rel="apple-touch-icon" sizes="180x180" href="assets/img/favicons/apple-touch-icon.png">#}
+    {#    <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicons/favicon-32x32.png">#}
+    {#    <link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicons/favicon-16x16.png">#}
+    {#    <link rel="manifest" href="assets/img/favicons/site.webmanifest">#}
+    {#    <link rel="mask-icon" href="assets/img/favicons/safari-pinned-tab.svg" color="#5bbad5">#}
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+
+    <title></title>
+</head>
+<body>
+
+
+<!-- Header -->
+<!-- <header class="header">
+	<div class="container">
+		<div class="header__inner">
+			<div class="header__logo">
+				ollo.gg
+			</div>
+			<nav>
+
+			</nav>
+		</div>
+	</div>
+</header> -->
+<!-- Nav -->
+
+<!-- Page content -->
+<div class="sidenav__wrapper">
+    <!-- Side navigation -->
+    <div class="sidenav">
+        <a href="#" class="ollo-logo">
+            <img class="main-logo" src="{% static 'v2/img/ollo-logo.svg' %}" alt="">
+        </a>
+        <div class="user__actions">
+            <a class="user__profile" href="#">Личный кабинет</a>
+            <div class="user__delim"></div>
+            <a class="user__settings" href="#"><img src="{% static 'v2/img/icons/sidebar/settings-icon.svg' %}" alt=""></a>
+        </div>
+        <div class="sidenav__options">
+            <a class="sidenav__option  active" href="#"><img src="{% static 'v2/img/icons/sidebar/csgo-icon.svg' %}"
+                                                             alt=""></a>
+            <a class="sidenav__option" href="#"><img src="{% static 'v2/img/icons/sidebar/dota-icon.svg' %}" alt=""></a>
+            <a class="sidenav__option" href="#"><img src="{% static 'v2/img/icons/sidebar/lol-icon.svg' %}" alt=""></a>
+            <a class="sidenav__option" href="#"><img src="{% static 'v2/img/icons/sidebar/foot-icon.svg' %}" alt=""></a>
+            <a class="sidenav__delim" href="#"><img src="{% static 'v2/img/icons/sidebar/delim-icon.svg' %}" alt=""></a>
+            <a class="sidenav__option  additional" href="#"><img
+                    src="{% static 'v2/img/icons/sidebar/poker-icon.svg' %}" alt=""></a>
+            <a class="sidenav__option  additional" href="#"><img
+                    src="{% static 'v2/img/icons/sidebar/poker-icon.svg' %}" alt=""></a>
+            <a class="sidenav__option  additional" href="#"><img
+                    src="{% static 'v2/img/icons/sidebar/poker-icon.svg' %}" alt=""></a>
+            <a class="sidenav__option  additional" href="#"><img
+                    src="{% static 'v2/img/icons/sidebar/poker-icon.svg' %}" alt=""></a>
+            <a class="sidenav__delim  additional" href="#"><img src="{% static 'v2/img/icons/sidebar/delim-icon.svg' %}"
+                                                                alt=""></a>
+        </div>
+    </div>
+</div>
+
+<div class="content__wrapper">
+    <!-- Page content -->
+    <div class="content">
+        <div class="container">
+            <div class="banner">
+                <div class="banner__container">
+                    <div class="banner-slider">
+                        <div><img src="{% static 'v2/img/factory.jpg' %}" alt=""></div>
+                        <div><img src="{% static 'v2/img/factory.jpg' %}" alt=""></div>
+                        <div><img src="{% static 'v2/img/factory.jpg' %}" alt=""></div>
+                        <div><img src="{% static 'v2/img/factory.jpg' %}" alt=""></div>
+                        <div><img src="{% static 'v2/img/factory.jpg' %}" alt=""></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xl-9 col-lg-8">
+                    <div class="matches__container">
+                        <p class="matches__title">Текущие матчи <span class="matches__timestamp">(UTC +03:00)</span></p>
+                        {% for match in lives %}
+                            <div class="match__wrapper">
+                                <div class="match__link">
+                                    <img src="{% static 'v2/img/factory.jpg' %}" alt="" class="match__league-img">
+                                    <div class="match__main">
+                                        {% with teams=match.team_set.all|dictsort:'pk' %}
+                                            <div class="team1__data">
+                                                <img class="team1-img" src="{{ teams.0.logo }}" alt="">
+                                                <span class="team1-name">{{ teams.0.name }}</span>
+                                            </div>
+                                            <!-- <span class="match-vs">VS</span> -->
+                                            <div class="match__short-info">
+                                                {% with start_time=match.start_date|get_local_time %}
+                                                    <div class="match-date">
+                                                        {{ start_time.hour|zfill:2 }}:{{ start_time.minute|zfill:2 }}
+                                                    </div>
+                                                {% endwith %}
+                                                <span class="match-bestof">BO{{ match.best_of }}</span>
+                                            </div>
+                                            <div class="team2__data">
+                                                <span class="team2-name">{{ teams.1.name }}</span>
+                                                <img class="team2-img" src="{{ teams.1.logo }}" alt="">
+                                            </div>
+                                            </div>
+                                            <div class="match__extras">
+                                                <a href="#" class="extra-link"><img class="extra-img"
+                                                                                    src="{% static 'v2/img/icons/play-icon.svg' %}"
+                                                                                    alt=""></a>
+                                                <a href="#" class="extra-link"><img class="extra-img"
+                                                                                    src="{% static 'v2/img/icons/analysis.svg' %}"
+                                                                                    alt=""></a>
+                                                <a href="#" class="extra-link"><img class="extra-img"
+                                                                                    src="{% static 'v2/img/icons/burger.svg' %}"
+                                                                                    alt=""></a>
+                                            </div>
+                                            </div>
+
+                                            <div class="match__main-content" style="display: none;">
+                                            <!-- <p class="title">Something is written here</p> -->
+                                            <div class="match__info">
+                                                <div class="match__team1-players">
+                                                    {% if match.index.ct_name == teams.0.name %}
+                                                        {% with player_list=match.index.counter_terrorists|json_unpack %}
+                                                            {% for player in player_list.players %}
+                                                                <div class="match__player">
+                                                                    <span class="player__nickname">{{ player.nick }}</span>
+                                                                    <div class="match__player-stats">
+                                                                        <span class="player__kills"><b>K:</b> {{ player.score }}</span>
+                                                                        <span class="player__assists"><b>A:</b> {{ player.assists }}</span>
+                                                                        <span class="player__deaths"><b>D:</b> {{ player.deaths }}</span>
+                                                                        <span class="player__adr"><b>ADR:</b> {{ player.adr|round_num:1 }}</span>
+                                                                    </div>
+                                                                </div>
+                                                            {% endfor %}
+                                                        {% endwith %}
+                                                    {% else %}
+                                                        {% with player_list=match.index.terrorists|json_unpack %}
+                                                            {% for player in player_list.players %}
+                                                                <div class="match__player">
+                                                                    <span class="player__nickname">{{ player.nick }}</span>
+                                                                    <div class="match__player-stats">
+                                                                        <span class="player__kills"><b>K:</b> {{ player.score }}</span>
+                                                                        <span class="player__assists"><b>A:</b> {{ player.assists }}</span>
+                                                                        <span class="player__deaths"><b>D:</b> {{ player.deaths }}</span>
+                                                                        <span class="player__adr"><b>ADR:</b> {{ player.adr|round_num:1 }}</span>
+                                                                    </div>
+                                                                </div>
+                                                            {% endfor %}
+                                                        {% endwith %}
+                                                    {% endif %}
+                                                </div>
+                                                <div class="match__maps">
+                                                    <div class="match__map">
+                                                        <img src="{% static 'v2/img/util/maps/dd2.svg' %}" alt=""
+                                                             class="map__img">
+                                                        <div class="match__map-score">
+                                                            <img src="{{ teams.0.logo }}" alt=""
+                                                                 class="map__team1-logo">
+                                                            {% if match.index.ct_name == teams.0.name %}
+                                                                <span class="map__score">{{ match.index.ct_score }} : {{ match.index.t_score }}</span>
+                                                            {% else %}
+                                                                <span class="map__score">{{ match.index.t_score }} : {{ match.index.ct_score }}</span>
+                                                            {% endif %}
+                                                            <img src="{{ teams.1.logo }}" alt=""
+                                                                 class="map__team2-logo">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="match__team2-players">
+                                                    {% if match.index.ct_name == teams.1.name %}
+                                                        {% with player_list=match.index.counter_terrorists|json_unpack %}
+                                                            {% for player in player_list.players %}
+                                                                <div class="match__player">
+                                                                    <span class="player__nickname">{{ player.nick }}</span>
+                                                                    <div class="match__player-stats">
+                                                                        <span class="player__kills"><b>K:</b> {{ player.score }}</span>
+                                                                        <span class="player__assists"><b>A:</b> {{ player.assists }}</span>
+                                                                        <span class="player__deaths"><b>D:</b> {{ player.deaths }}</span>
+                                                                        <span class="player__adr"><b>ADR:</b> {{ player.adr|round_num:1 }}</span>
+                                                                    </div>
+                                                                </div>
+                                                            {% endfor %}
+                                                        {% endwith %}
+                                                    {% else %}
+                                                        {% with player_list=match.index.terrorists|json_unpack %}
+                                                            {% for player in player_list.players %}
+                                                                <div class="match__player">
+                                                                    <span class="player__nickname">{{ player.nick }}</span>
+                                                                    <div class="match__player-stats">
+                                                                        <span class="player__kills"><b>K:</b> {{ player.score }}</span>
+                                                                        <span class="player__assists"><b>A:</b> {{ player.assists }}</span>
+                                                                        <span class="player__deaths"><b>D:</b> {{ player.deaths }}</span>
+                                                                        <span class="player__adr"><b>ADR:</b> {{ player.adr|round_num:1 }}</span>
+                                                                    </div>
+                                                                </div>
+                                                            {% endfor %}
+                                                        {% endwith %}
+                                                    {% endif %}
+                                                </div>
+                                            </div> <!-- ./match__info -->
+                                        {% endwith %}
+                                        <div class="media">
+                                            <div class="media__switcher">
+                                                <div class="streams__switch  selected">
+                                                    <a href="#" class="">Прямая трансляция</a>
+                                                </div>
+                                                <div class="data__switch">
+                                                    <a href="#" class="">Детальная статистика</a>
+                                                </div>
+                                            </div>
+                                            <div class="match__streams">
+                                                {% for stream in match.streams %}
+                                                    <div class="stream__option" title="{{ stream.2|get_twitch_user }}">{{ stream.0 }}</div>
+                                                {% endfor %}
+                                            </div>
+                                            <div class="stream__wrapper">
+                                                <iframe
+                                                        src="https://player.twitch.tv/?channel={{ match.streams.0.2|get_twitch_user }}&muted=true"
+                                                        class="stream"
+                                                        height=450
+                                                        width="100%"
+                                                        frameborder="0"
+                                                        scrolling="no"
+                                                        allowfullscreen="true">
+                                                </iframe>
+                                            </div>
+                                        </div>
+                                        </div>
+                            </div> <!-- ./match__main-content -->
+                        {% endfor %}
+                    </div>
+                    <div class="switcher">
+                        <div class="upcoming__switch  selected">
+                            <p class="">Предстоящие матчи</p>
+                        </div>
+                        <div class="past__switch">
+                            <p class="">Прошедшие матчи</p>
+                        </div>
+                    </div>
+
+                    <div class="matches__container">
+                        <p class="matches__title">Предстоящие матчи <span
+                                class="matches__timestamp">(UTC +03:00)</span>
+                        </p>
+                        {% for match in upcoming %}
+                            <div class="match__wrapper">
+                                <div class="match__link">
+                                    <img src="{{ match.event }}" alt="" class="match__league-img">
+                                    <div class="match__main">
+                                        {% with teams=match.team_set.all|dictsort:'pk' %}
+                                            <div class="team1__data">
+                                                <img class="team1-img" src="{{ teams.0.logo }}" alt="">
+                                                <span class="team1-name">{{ teams.0.name }}</span>
+                                            </div>
+                                            <div class="match__short-info">
+                                                {% with start_time=match.start_date|get_local_time %}
+                                                    <div class="match-date">
+                                                        {{ start_time.hour|zfill:2 }}:{{ start_time.minute|zfill:2 }}
+                                                    </div>
+                                                {% endwith %}
+                                                <span class="match-bestof">{{ match.best_of|upper }}</span>
+                                            </div>
+                                            <div class="team2__data">
+                                                <span class="team2-name">{{ teams.1.name }}</span>
+                                                <img class="team2-img" src="{{ teams.1.logo }}" alt="">
+                                            </div>
+                                            </div>
+                                        {% endwith %}
+                                    <div class="match__extras-nolive">
+                                        <a href="#" class="extra-link"><img class="extra-img"
+                                                                            src="{% static 'v2/img/icons/analysis.svg' %}"
+                                                                            alt=""></a>
+                                        <a href="#" class="extra-link"><img class="extra-img"
+                                                                            src="{% static 'v2/img/icons/burger.svg' %}"
+                                                                            alt=""></a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div> <!-- ./matches__container -->
+                </div> <!-- ./col -->
+                <div class="col-xl-3 col-lg-4">
+                    <div class="motd">
+                        <span class="motd__title">Матч дня</span>
+                        <div class="motd__overview">
+                            <div class="motd__bg-pic__wrapper">
+                            </div>
+                            <div class="motd__teams-images">
+                                <img class="motd__team-img" src="{% static 'v2/img/NAVI_logo.png' %}" alt="">
+                                <div class="motd__info">
+                                    <span class="motd__score">3<span class="motd__score-delim">:</span>5</span>
+                                    <span class="motd__versus">VS</span>
+                                    <span class="motd__time-best-of">18:00 BO3</span>
+                                </div>
+                                <img class="motd__team-img" src="{% static 'v2/img/NAVI_logo.png' %}" alt="">
+                            </div>
+                        </div>
+                    </div> <!-- ./motd -->
+
+                    <div class="vk__info">
+                        <p class="vk__title">Не пропускай свежие новости!</p>
+                        <p class="vk__link">/OLLOgg</p>
+                        <img src="{% static 'v2/img/rightbar/vk-logo.svg' %}" alt="" class="vk__img">
+                    </div>
+
+                    <div class="skin__ad">
+                        <img src="{% static 'v2/img/rightbar/ak47.svg' %}" alt="" class="skin-main">
+                        <img src="{% static 'v2/img/rightbar/ak47-bg-left.svg' %}" alt="" class="skin-bg-left">
+                        <img src="{% static 'v2/img/rightbar/ak47-bg-right.svg' %}" alt="" class="skin-bg-right">
+                        <a href="#" class="skin__btn">Забрать скин!</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <a href="" class="button-to-top"></a>
+</div>
+
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-lg-9">
+                <div class="footer__content">
+                    <div class="footer__social">
+                        <a href="" class="footer__contact-img"><img src="{% static 'v2/img/icons/footer/yt-icon.svg' %}" alt=""
+                                                                    class=""></a>
+                        <a href="" class="footer__contact-img"><img src="{% static 'v2/img/icons/footer/tg-icon.svg' %}" alt=""
+                                                                    class=""></a>
+                        <a href="" class="footer__contact-img"><img src="{% static 'v2/img/icons/footer/vk-icon.svg' %}" alt=""
+                                                                    class=""></a>
+                    </div>
+                    <div class="footer__links">
+                        <a href="" class="footer__link">О проекте</a>
+                        <a href="" class="footer__link">Карьера</a>
+                        <a href="" class="footer__link">Контакты</a>
+                        <a href="" class="footer__link">Правила</a>
+                        <a href="" class="footer__link">Пользовательское соглашение</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="footer__copyright">
+                    <p class="copyright">© OLLO.gg </p>
+                    <p class="bet">18+ <a href="#" class="bet-rules">Bet responsibly</a></p>
+                    <p class="credentials">Made by <a href="#" class="cred-link">maked.me</a></p>
+                </div>
+            </div>
+        </div>
+    </div><!-- /.container -->
+</footer>
+
+
+<!-- Scripts -->
+
+<script src="{% static 'v2/other/jquery-3.4.1.min.js' %}"></script>
+<script src="{% static 'v2/other/slick/slick.min.js' %}"></script>
+<script src="{% static 'v2/other/init.js' %}"></script>
+
+<!-- <script src="assets/js/app.js"></script> -->
+
+<a id="button-to-top" title="Go to top"></a>
+
+</body>
+</html>

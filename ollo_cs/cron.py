@@ -10,7 +10,7 @@ from ollo_cs.parse.live.livescore import Livescore
 
 
 class GetUpcoming(CronJobBase):
-    RUN_EVERY_MINS = 30
+    RUN_EVERY_MINS = 0.1
 
     schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
     code = 'ollo_cs.cron.get_upcoming'
@@ -28,10 +28,16 @@ class GetUpcoming(CronJobBase):
                 time_string = '{}-{}-{} {}'.format(month, day, year, match['time'])
                 start_time = datetime.datetime.strptime(time_string, '%m-%d-%y %H:%M') + datetime.timedelta(hours=2)
                 local_time = timezone.get_current_timezone().localize(start_time)
-                print(local_time)
+                # print(start_time)
+                # print(local_time)
                 if not Match.objects.filter(match_id=match['id']):
                     try:
-                        prem = Match(start_date=local_time, best_of=match['bestof'], event=match['event'], id=match['id'], match_id=match['id'])
+                        prem = Match(start_date=local_time,
+                                     best_of=match['bestof'],
+                                     event=match['event'],
+                                     id=match['id'],
+                                     match_id=match['id'],
+                                     streams=match['streams'])
                         prem.save()
                         indexinfo = IndexMatchInfo(match=prem)
                         indexinfo.save()

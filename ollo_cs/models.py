@@ -1,5 +1,6 @@
 import datetime
 
+from django.contrib.postgres.fields import ArrayField
 from django.utils import timezone
 from jsonfield import JSONField
 from django.db import models
@@ -32,6 +33,7 @@ class Match(models.Model):
     match_id = models.IntegerField(default=0)
     is_live = models.BooleanField(default=False)
     has_ended = models.BooleanField(default=False)
+    streams = ArrayField(ArrayField(models.CharField(max_length=250)))
 
     maps_played = models.IntegerField(default=0)
     winner = models.CharField(max_length=50)

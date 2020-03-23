@@ -10,7 +10,7 @@ def index(request):
     context = {'upcoming': upcoming,
                'lives': lives,
                }
-    return render(request, 'ollo_cs/index.html', context)
+    return render(request, 'ollo_cs/v2/index.html', context)
 
 
 def match(request, match_id):

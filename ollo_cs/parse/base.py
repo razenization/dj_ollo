@@ -211,6 +211,19 @@ def get_matches():
                 match_obj['date'] = match.find("span", {"class": "standard-headline"}).text
                 match_obj['time'] = getMatch.find("td", {"class": "time"}).text.lstrip().rstrip()
 
+                match_page = get_parsed_page(f"https://hltv.org{href}")
+
+                match_obj['streams'] = []
+
+                for stream in match_page.find_all('div', {'class': 'stream-box'}):
+                    try:
+                        stream = (stream.find('div', {'class': 'stream-box-embed'}).find('img').get('alt'),
+                                  stream.find('div', {'class': 'stream-box-embed'}).find('img').get('src'),
+                                  stream.find('div', {'class': 'watchbox-right'}).find('a').get('href'))
+                        match_obj['streams'].append(stream)
+                    except:
+                        continue
+
                 if getMatch.find("td", {"class": "placeholder-text-cell"}):
                     match_obj['event'] = getMatch.find("td", {"class": "placeholder-text-cell"}).text
                 elif getMatch.find("td", {"class": "event"}):
@@ -317,9 +330,10 @@ def get_lives():
             href = live.find('a').get('href')
         except AttributeError:
             continue
+
         match_obj['id'] = re.search("\\d+", href).group(0)
         match_obj['date'] = "{}-{}-{}".format(datetime.datetime.today().year, datetime.datetime.today().month,
-                                              datetime.datetime.today().day)
+                                              datetime.datetime.today().day - 1)
 
         if live.find("div", {"class": "event-name"}):
             match_obj['event'] = live.find("div", {"class": "event-name"}).text
@@ -327,6 +341,16 @@ def get_lives():
             match_obj['event'] = None
 
         match_page = get_parsed_page(f"https://hltv.org{href}")
+        match_obj['streams'] = []
+
+        for stream in match_page.find_all('div', {'class': 'stream-box'}):
+            try:
+                stream = (stream.find('div', {'class': 'stream-box-embed'}).find('img').get('alt'),
+                          stream.find('div', {'class': 'stream-box-embed'}).find('img').get('src'),
+                          stream.find('div', {'class': 'watchbox-right'}).find('a').get('href'))
+                match_obj['streams'].append(stream)
+            except:
+                continue
 
         match_obj['time'] = match_page.find("div", {"class": "time"}).text.lstrip().rstrip()
 

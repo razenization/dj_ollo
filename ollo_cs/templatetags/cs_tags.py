@@ -9,6 +9,8 @@ register = template.Library()
 @register.filter
 def get_local_time(date):
     import pytz
+    print(date)
+    print(type(date))
     timezone.activate(pytz.timezone(timezone.get_current_timezone_name()))
     return timezone.localtime(date)
 
@@ -47,3 +49,9 @@ def weapon_img(weapon):
 @register.filter
 def round_num(num, q):
     return round(num, q)
+
+
+@register.filter
+def get_twitch_user(tw_href):
+    print(tw_href)
+    return tw_href.split('/')[-1]

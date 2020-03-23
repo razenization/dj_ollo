@@ -1,5 +1,6 @@
 import datetime
 import json
+import os
 import traceback
 
 import socketio
@@ -105,6 +106,8 @@ class Livescore:
                 pass
 
     def __init__(self, list_id=None):
+        self.pid = os.getpid()
+        print(self.pid)
         self.list_id = list_id
         self.sb_callback = self.sb_callb
         self.event_callback = self.event_callb
