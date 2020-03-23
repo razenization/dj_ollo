@@ -5,10 +5,8 @@
 ## What's included
 
 - CS / DOTA data parsing directly from api / socket.io connections
-- MaterializeCSS front
 - ASGI support
-- Websockets
-- Django REST framework
+- Front-end design
 
 Ollo uses PostgreSQL for development.
 
